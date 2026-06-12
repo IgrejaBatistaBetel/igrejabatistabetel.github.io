@@ -19,15 +19,7 @@ data.estatisticas.congregados;
 document.getElementById("batizados").innerText =
 data.estatisticas.batizados;
 
-}catch(error){
-
-console.log(error);
-
-}
-
-}
-
-carregarDados();
+/* AVISOS */
 
 const avisosContainer =
 document.getElementById("avisos-container");
@@ -36,12 +28,23 @@ avisosContainer.innerHTML = "";
 
 data.avisos.forEach(aviso => {
 
-  avisosContainer.innerHTML += `
-    <div class="card">
-      <strong>${aviso.titulo}</strong>
-      <br>
-      ${aviso.data}
-    </div>
-  `;
+avisosContainer.innerHTML += `
+<div class="card">
+<strong>${aviso.titulo}</strong>
+<br>
+${aviso.data}
+</div>
+`;
 
+});
+
+}catch(error){
+
+console.error(error);
+
+}
+
+}
+
+carregarDados();
 });
