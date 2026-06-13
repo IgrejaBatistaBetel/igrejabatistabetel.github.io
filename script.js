@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzYpL9ixNvK2WD_g34ob3F9P9TBSUTPQaEDxZC-0_rn78xi-sRFRcO9mwRjC9PX0Jp7lg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwAZp1ylMke-_xptIHcwgWYG5QyGHfX9qIDoGb6w-Sb-TgluzulAGEHbSTmmK3Glx3w/exec";
 
 async function carregarDados() {
 
