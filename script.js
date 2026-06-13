@@ -34,10 +34,26 @@ async function carregarDados() {
           </div>
         `;
 
-      });
+const agendaContainer =
+  document.getElementById("agenda-container");
 
-    }
+if (agendaContainer && data.agenda) {
 
+  agendaContainer.innerHTML = "";
+
+  data.agenda.forEach(item => {
+
+    agendaContainer.innerHTML += `
+      <div class="card">
+        <strong>${item.evento}</strong><br>
+        ${item.dia} • ${item.hora}
+      </div>
+    `;
+
+  });
+
+}  
+    
   } catch (error) {
 
     console.error(error);
