@@ -20,15 +20,19 @@ PWA CONFIG
 <meta name="theme-color" content="#D4AF37">
 
 <!-- =========================
-ONESIGNAL (NOTIFICAÇÕES)
+ONESIGNAL (WEB PUSH SDK v16)
 ========================= -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
+
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
-      appId: "SEU_APP_ID_AQUI"
+      appId: "8c9aba72-949e-428d-b1dc-fc8a5b84d393",
+      notifyButton: {
+        enable: false
+      }
     });
   });
 </script>
