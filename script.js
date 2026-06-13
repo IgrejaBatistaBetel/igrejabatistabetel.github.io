@@ -9,57 +9,83 @@ async function carregarDados() {
 
     console.log(data);
 
+    // =========================
+    // ESTATÍSTICAS
+    // =========================
     document.getElementById("membros").innerText =
-      data.estatisticas.membros;
+      data.estatisticas?.membros ?? 0;
 
     document.getElementById("congregados").innerText =
-      data.estatisticas.congregados;
+      data.estatisticas?.congregados ?? 0;
 
     document.getElementById("batizados").innerText =
-      data.estatisticas.batizados;
+      data.estatisticas?.batizados ?? 0;
 
-    const avisosContainer =
-      document.getElementById("avisos-container");
 
-    if (avisosContainer && data.avisos) {
+    // =========================
+    // AVISOS
+    // =========================
+    const avisosContainer = document.getElementById("avisos-container");
 
-      avisosContainer.innerHTML = "";
+    if (avisosContainer && Array.isArray(data.avisos)) {
+
+      let htmlAvisos = "";
 
       data.avisos.forEach(aviso => {
-
-        avisosContainer.innerHTML += `
+        htmlAvisos += `
           <div class="card">
             <strong>${aviso.titulo}</strong><br>
-            ${new Date(aviso.data).toLocaleDateString("pt-BR")}
+            ${formatarData(aviso.data)}
           </div>
         `;
+      });
 
-const agendaContainer =
-  document.getElementById("agenda-container");
+      avisosContainer.innerHTML = htmlAvisos;
+    }
 
-if (agendaContainer && data.agenda) {
 
-  agendaContainer.innerHTML = "";
+    // =========================
+    // AGENDA
+    // =========================
+    const agendaContainer = document.getElementById("agenda-container");
 
-  data.agenda.forEach(item => {
+    if (agendaContainer && Array.isArray(data.agenda)) {
 
-    agendaContainer.innerHTML += `
-      <div class="card">
-        <strong>${item.evento}</strong><br>
-        ${item.dia} • ${item.hora}
-      </div>
-    `;
+      let htmlAgenda = "";
 
-  });
+      data.agenda.forEach(item => {
+        htmlAgenda += `
+          <div class="card">
+            <strong>${item.evento}</strong><br>
+            ${item.dia} • ${item.hora}
+          </div>
+        `;
+      });
 
-}  
-    
+      agendaContainer.innerHTML = htmlAgenda;
+    }
+
   } catch (error) {
-
-    console.error(error);
-
+    console.error("Erro ao carregar dados:", error);
   }
-
 }
 
+
+// =========================
+// UTILITÁRIO DE DATA
+// =========================
+function formatarData(data) {
+  if (!data) return "";
+
+  const d = new Date(data);
+
+  if (isNaN(d.getTime())) return data; // fallback se vier quebrado
+
+  return d.toLocaleDateString("pt-BR");
+}
+
+
+// =========================
+// INICIALIZA
+// =========================
 carregarDados();
