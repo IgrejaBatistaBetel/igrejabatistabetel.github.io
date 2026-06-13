@@ -2,151 +2,389 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-I
 
 
 // =========================
-// CARREGAR DADOS (GET)
+// CARREGAR DADOS
 // =========================
 async function carregarDados() {
 
   try {
 
-    const response = await fetch(API_URL + "?nocache=" + Date.now());
+    const response = await fetch(
+      API_URL + "?nocache=" + Date.now()
+    );
+
     const data = await response.json();
 
     console.log("DADOS API:", data);
 
-    atualizarTexto("membros", data.estatisticas?.membros);
-    atualizarTexto("congregados", data.estatisticas?.congregados);
-    atualizarTexto("batizados", data.estatisticas?.batizados);
+    // =========================
+    // ESTATÍSTICAS
+    // =========================
+    atualizarTexto(
+      "membros",
+      data.estatisticas?.membros
+    );
 
+    atualizarTexto(
+      "congregados",
+      data.estatisticas?.congregados
+    );
 
-    renderLista("avisos-container", data.avisos, (aviso) => `
-      <div class="card">
-        <strong>${aviso.titulo}</strong><br>
-        ${formatarData(aviso.data)}
-      </div>
-    `);
+    atualizarTexto(
+      "batizados",
+      data.estatisticas?.batizados
+    );
 
+    // =========================
+    // AVISOS
+    // =========================
+    renderLista(
+      "avisos-container",
+      data.avisos,
+      (aviso) => `
+        <div class="card">
+          <strong>${aviso.titulo}</strong><br>
+          ${formatarData(aviso.data)}
+        </div>
+      `
+    );
 
-    renderLista("agenda-container", data.agenda, (item) => `
-      <div class="card">
-        <strong>${item.evento}</strong><br>
-        ${item.dia} • ${item.hora}
-      </div>
-    `);
+    // =========================
+    // AGENDA
+    // =========================
+    renderLista(
+      "agenda-container",
+      data.agenda,
+      (item) => `
+        <div class="card">
+          <strong>${item.evento}</strong><br>
+          ${item.dia} • ${item.hora}
+        </div>
+      `
+    );
 
+    // =========================
+    // VERSÍCULO
+    // =========================
+    const versiculo =
+      document.getElementById("versiculo");
 
-    const versiculoElement = document.getElementById("versiculo");
+    if (versiculo && data.versiculo) {
 
-    if (versiculoElement && data.versiculo) {
-      versiculoElement.style.opacity = 0;
+      versiculo.style.opacity = 0;
 
       setTimeout(() => {
-        versiculoElement.innerText = data.versiculo;
-        versiculoElement.style.opacity = 1;
+
+        versiculo.innerText =
+          data.versiculo;
+
+        versiculo.style.transition =
+          "opacity .6s ease";
+
+        versiculo.style.opacity = 1;
+
       }, 200);
+
     }
 
-
-    renderLista("oracoes-container", data.oracoes, (o) => `
-      <div class="card">
-        <strong>${o.nome}</strong><br>
-        ${o.pedido}
-      </div>
-    `);
+    // =========================
+    // ORAÇÕES
+    // =========================
+    renderLista(
+      "oracoes-container",
+      data.oracoes,
+      (o) => `
+        <div class="card">
+          <strong>${o.nome}</strong><br>
+          ${o.pedido}
+        </div>
+      `
+    );
 
   } catch (error) {
-    console.error("Erro ao carregar dados:", error);
+
+    console.error(
+      "Erro ao carregar dados:",
+      error
+    );
+
   }
 }
 
 
 // =========================
-// ENVIO DE ORAÇÃO (POST)
+// ENVIO DE ORAÇÃO
 // =========================
-const form = document.getElementById("oracaoForm");
+const form =
+  document.getElementById("oracaoForm");
 
 if (form) {
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  form.addEventListener(
+    "submit",
+    async (e) => {
 
-    const nome = document.getElementById("nome").value;
-    const pedido = document.getElementById("pedido").value;
+      e.preventDefault();
 
-    try {
+      const nome =
+        document.getElementById("nome")
+        .value
+        .trim();
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          nome,
-          pedido
-        })
-      });
+      const pedido =
+        document.getElementById("pedido")
+        .value
+        .trim();
 
-      const result = await response.json();
+      if (!nome || !pedido) {
 
-      if (result.status === "ok") {
-        alert("Pedido enviado 🙏");
+        alert(
+          "Preencha todos os campos 🙏"
+        );
 
-        form.reset();
+        return;
 
-        carregarDados(); // atualiza lista na hora
       }
 
-    } catch (error) {
-      console.error("Erro ao enviar oração:", error);
-      alert("Erro ao enviar pedido 😢");
+      try {
+
+        const response =
+          await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              nome,
+              pedido
+            })
+
+          });
+
+        const result =
+          await response.json();
+
+        console.log(
+          "Resposta POST:",
+          result
+        );
+
+        if (
+          result.status === "ok"
+        ) {
+
+          alert(
+            "Pedido enviado 🙏"
+          );
+
+          form.reset();
+
+          carregarDados();
+
+        } else {
+
+          alert(
+            "Não foi possível enviar."
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Erro ao enviar oração:",
+          error
+        );
+
+        alert(
+          "Erro ao enviar pedido 😢"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+// =========================
+// INSTALAR APP (PWA)
+// =========================
+let deferredPrompt;
+
+const installBtn =
+  document.getElementById(
+    "installBtn"
+  );
+
+window.addEventListener(
+  "beforeinstallprompt",
+  (e) => {
+
+    e.preventDefault();
+
+    deferredPrompt = e;
+
+    if (installBtn) {
+
+      installBtn.style.display =
+        "inline-block";
+
     }
 
-  });
+  }
+);
+
+if (installBtn) {
+
+  installBtn.addEventListener(
+    "click",
+    async () => {
+
+      if (!deferredPrompt)
+        return;
+
+      deferredPrompt.prompt();
+
+      const {
+        outcome
+      } =
+      await deferredPrompt.userChoice;
+
+      console.log(
+        "Instalação:",
+        outcome
+      );
+
+      deferredPrompt = null;
+
+      installBtn.style.display =
+        "none";
+
+    }
+  );
+
 }
+
+window.addEventListener(
+  "appinstalled",
+  () => {
+
+    console.log(
+      "BBNJ instalada!"
+    );
+
+    if (installBtn) {
+
+      installBtn.style.display =
+        "none";
+
+    }
+
+  }
+);
 
 
 // =========================
 // FUNÇÕES AUXILIARES
 // =========================
-function atualizarTexto(id, valor) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = valor ?? 0;
+function atualizarTexto(
+  id,
+  valor
+) {
+
+  const el =
+    document.getElementById(id);
+
+  if (el) {
+
+    el.innerText =
+      valor ?? 0;
+
+  }
+
 }
 
+function renderLista(
+  containerId,
+  lista,
+  templateFn
+) {
 
-function renderLista(containerId, lista, templateFn) {
+  const container =
+    document.getElementById(
+      containerId
+    );
 
-  const container = document.getElementById(containerId);
-
-  if (!container || !Array.isArray(lista)) return;
+  if (
+    !container ||
+    !Array.isArray(lista)
+  ) {
+    return;
+  }
 
   container.innerHTML = "";
 
-  lista.forEach((item, index) => {
+  lista.forEach(
+    (item, index) => {
 
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = templateFn(item);
+      const wrapper =
+        document.createElement(
+          "div"
+        );
 
-    const element = wrapper.firstElementChild;
+      wrapper.innerHTML =
+        templateFn(item);
 
-    if (element) {
-      element.style.animationDelay = (index * 0.08) + "s";
-      container.appendChild(element);
+      const element =
+        wrapper.firstElementChild;
+
+      if (element) {
+
+        element.style.animationDelay =
+          (index * 0.08) + "s";
+
+        container.appendChild(
+          element
+        );
+
+      }
+
     }
-
-  });
+  );
 
 }
 
+function formatarData(
+  data
+) {
 
-function formatarData(data) {
-  if (!data) return "";
+  if (!data)
+    return "";
 
-  const d = new Date(data);
+  const d =
+    new Date(data);
 
-  if (isNaN(d.getTime())) return data;
+  if (
+    isNaN(
+      d.getTime()
+    )
+  ) {
+    return data;
+  }
 
-  return d.toLocaleDateString("pt-BR");
+  return d.toLocaleDateString(
+    "pt-BR"
+  );
+
 }
 
 
 // =========================
-// INICIALIZA
+// INICIAR SITE
 // =========================
 carregarDados();
