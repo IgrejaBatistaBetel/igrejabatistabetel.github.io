@@ -64,6 +64,56 @@ renderLista(
 );
 
 // =========================
+// ESCALA SEMANAL
+// =========================
+const escalaContainer =
+  document.getElementById("escala-container");
+
+if (
+  escalaContainer &&
+  Array.isArray(data.escala)
+) {
+
+  const grupos = {};
+
+  data.escala.forEach(item => {
+
+    if (!grupos[item.dia]) {
+      grupos[item.dia] = [];
+    }
+
+    grupos[item.dia].push(item);
+
+  });
+
+  let htmlEscala = "";
+
+  Object.keys(grupos).forEach(dia => {
+
+    htmlEscala += `
+      <div class="card escala-card">
+
+        <h3>📅 ${dia}</h3>
+
+        ${grupos[dia]
+          .map(item => `
+            <p>
+              <strong>${item.funcao}:</strong>
+              ${item.responsavel}
+            </p>
+          `)
+          .join("")}
+
+      </div>
+    `;
+
+  });
+
+  escalaContainer.innerHTML = htmlEscala;
+
+}
+
+// =========================
 // VERSÍCULO
 // =========================
 const versiculo =
