@@ -203,11 +203,6 @@ if (form) {
 
             method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
             body: JSON.stringify({
               nome,
               pedido
@@ -235,8 +230,6 @@ if (form) {
           );
 
           form.reset();
-
-          carregarDados();
 
         } else {
 
