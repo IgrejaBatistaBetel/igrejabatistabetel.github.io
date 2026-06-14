@@ -118,7 +118,7 @@ async function carregarDados() {
     // =========================
     renderLista(
       "sobre-container",
-      data.sobre,
+      data.sobreNos,
       (item) => `
         <div class="card">
           <h3>${item.titulo}</h3>
