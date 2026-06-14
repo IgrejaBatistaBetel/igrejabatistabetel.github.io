@@ -1,7 +1,7 @@
 {
   "name": "Batista Betel",
-  "short_name": "B.B.N.J",
-  "start_url": "/site/",
+  "short_name": "Batista Betel",
+  "start_url": "https://igrejabatistabetel.github.io/",
   "display": "standalone",
   "background_color": "#102A43",
   "theme_color": "#D4AF37",
