@@ -1,215 +1,211 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
 
-
 // =========================
 // CARREGAR DADOS
 // =========================
 async function carregarDados() {
 
-  try {
+try {
 
-    const response = await fetch(
-      API_URL + "?nocache=" + Date.now()
-    );
+```
+const response = await fetch(
+  API_URL + "?nocache=" + Date.now()
+);
 
-    const data = await response.json();
+const data = await response.json();
 
-    console.log("DADOS API:", data);
+console.log("DADOS API:", data);
 
-    // =========================
-    // ESTATÍSTICAS
-    // =========================
-    atualizarTexto(
-      "membros",
-      data.estatisticas?.membros
-    );
+// =========================
+// ESTATÍSTICAS
+// =========================
+atualizarTexto(
+  "membros",
+  data.estatisticas?.membros
+);
 
-    atualizarTexto(
-      "congregados",
-      data.estatisticas?.congregados
-    );
+atualizarTexto(
+  "congregados",
+  data.estatisticas?.congregados
+);
 
-    atualizarTexto(
-      "batizados",
-      data.estatisticas?.batizados
-    );
+atualizarTexto(
+  "batizados",
+  data.estatisticas?.batizados
+);
 
-    // =========================
-    // AVISOS
-    // =========================
-    renderLista(
-      "avisos-container",
-      data.avisos,
-      (aviso) => `
-        <div class="card">
-          <strong>${aviso.titulo}</strong><br>
-          ${formatarData(aviso.data)}
-        </div>
-      `
-    );
+// =========================
+// AVISOS
+// =========================
+renderLista(
+  "avisos-container",
+  data.avisos,
+  (aviso) => `
+    <div class="card">
+      <strong>${aviso.titulo}</strong><br>
+      📅 ${formatarData(aviso.data)}
+      ${aviso.hora ? `<br>🕒 ${aviso.hora}` : ""}
+    </div>
+  `
+);
 
-    // =========================
-    // AGENDA
-    // =========================
-    renderLista(
-      "agenda-container",
-      data.agenda,
-      (item) => `
-        <div class="card">
-          <strong>${item.evento}</strong><br>
-          ${item.dia} • ${item.hora}
-        </div>
-      `
-    );
+// =========================
+// AGENDA
+// =========================
+renderLista(
+  "agenda-container",
+  data.agenda,
+  (item) => `
+    <div class="card">
+      <strong>${item.evento}</strong><br>
+      ${item.dia} • ${item.hora}
+    </div>
+  `
+);
 
-    // =========================
-    // VERSÍCULO
-    // =========================
-    const versiculo =
-      document.getElementById("versiculo");
+// =========================
+// VERSÍCULO
+// =========================
+const versiculo =
+  document.getElementById("versiculo");
 
-    if (versiculo && data.versiculo) {
+if (versiculo && data.versiculo) {
 
-      versiculo.style.opacity = 0;
+  versiculo.style.opacity = 0;
 
-      setTimeout(() => {
+  setTimeout(() => {
 
-        versiculo.innerText =
-          data.versiculo;
+    versiculo.innerText =
+      data.versiculo;
 
-        versiculo.style.transition =
-          "opacity .6s ease";
+    versiculo.style.transition =
+      "opacity .6s ease";
 
-        versiculo.style.opacity = 1;
+    versiculo.style.opacity = 1;
 
-      }, 200);
+  }, 200);
 
-    }
+}
+```
 
-    // =========================
-    // ORAÇÕES
-    // =========================
-    renderLista(
-      "oracoes-container",
-      data.oracoes,
-      (o) => `
-        <div class="card">
-          <strong>${o.nome}</strong><br>
-          ${o.pedido}
-        </div>
-      `
-    );
+} catch (error) {
 
-  } catch (error) {
+```
+console.error(
+  "Erro ao carregar dados:",
+  error
+);
+```
 
-    console.error(
-      "Erro ao carregar dados:",
-      error
-    );
-
-  }
 }
 
+}
 
 // =========================
 // ENVIO DE ORAÇÃO
 // =========================
 const form =
-  document.getElementById("oracaoForm");
+document.getElementById("oracaoForm");
 
 if (form) {
 
-  form.addEventListener(
-    "submit",
-    async (e) => {
+form.addEventListener(
+"submit",
+async (e) => {
 
-      e.preventDefault();
+```
+  e.preventDefault();
 
-      const nome =
-        document.getElementById("nome")
-        .value
-        .trim();
+  const nome =
+    document.getElementById("nome")
+    .value
+    .trim();
 
-      const pedido =
-        document.getElementById("pedido")
-        .value
-        .trim();
+  const pedido =
+    document.getElementById("pedido")
+    .value
+    .trim();
 
-      if (!nome || !pedido) {
+  if (!nome || !pedido) {
 
-        alert(
-          "Preencha todos os campos 🙏"
-        );
+    alert(
+      "Preencha todos os campos 🙏"
+    );
 
-        return;
+    return;
 
-      }
+  }
 
-      try {
+  try {
 
-        const response =
-          await fetch(API_URL, {
+    const response =
+      await fetch(API_URL, {
 
-            method: "POST",
+        method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-            body: JSON.stringify({
-              nome,
-              pedido
-            })
+        body: JSON.stringify({
+          nome,
+          pedido
+        })
 
-          });
+      });
 
-        const result =
-          await response.json();
+    const texto =
+      await response.text();
 
-        console.log(
-          "Resposta POST:",
-          result
-        );
+    console.log(
+      "Resposta bruta:",
+      texto
+    );
 
-        if (
-          result.status === "ok"
-        ) {
+    const result =
+      JSON.parse(texto);
 
-          alert(
-            "Pedido enviado 🙏"
-          );
+    if (
+      result.status === "ok"
+    ) {
 
-          form.reset();
+      alert(
+        "🙏 Pedido enviado com sucesso!"
+      );
 
-          carregarDados();
+      form.reset();
 
-        } else {
+      carregarDados();
 
-          alert(
-            "Não foi possível enviar."
-          );
+    } else {
 
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Erro ao enviar oração:",
-          error
-        );
-
-        alert(
-          "Erro ao enviar pedido 😢"
-        );
-
-      }
+      alert(
+        result.message ||
+        "Não foi possível enviar."
+      );
 
     }
-  );
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao enviar oração:",
+      error
+    );
+
+    alert(
+      "😢 Erro ao enviar pedido."
+    );
+
+  }
 
 }
+```
 
+);
+
+}
 
 // =========================
 // INSTALAR APP (PWA)
@@ -217,172 +213,195 @@ if (form) {
 let deferredPrompt;
 
 const installBtn =
-  document.getElementById(
-    "installBtn"
-  );
+document.getElementById(
+"installBtn"
+);
 
 window.addEventListener(
-  "beforeinstallprompt",
-  (e) => {
+"beforeinstallprompt",
+(e) => {
 
-    e.preventDefault();
+```
+e.preventDefault();
 
-    deferredPrompt = e;
+deferredPrompt = e;
 
-    if (installBtn) {
+if (installBtn) {
 
-      installBtn.style.display =
-        "inline-block";
+  installBtn.style.display =
+    "inline-block";
 
-    }
+}
+```
 
-  }
+}
 );
 
 if (installBtn) {
 
-  installBtn.addEventListener(
-    "click",
-    async () => {
+installBtn.addEventListener(
+"click",
+async () => {
 
-      if (!deferredPrompt)
-        return;
+```
+  if (!deferredPrompt)
+    return;
 
-      deferredPrompt.prompt();
+  deferredPrompt.prompt();
 
-      const {
-        outcome
-      } =
-      await deferredPrompt.userChoice;
+  const {
+    outcome
+  } =
+  await deferredPrompt.userChoice;
 
-      console.log(
-        "Instalação:",
-        outcome
-      );
-
-      deferredPrompt = null;
-
-      installBtn.style.display =
-        "none";
-
-    }
+  console.log(
+    "Instalação:",
+    outcome
   );
+
+  deferredPrompt = null;
+
+  installBtn.style.display =
+    "none";
+
+}
+```
+
+);
 
 }
 
 window.addEventListener(
-  "appinstalled",
-  () => {
+"appinstalled",
+() => {
 
-    console.log(
-      "BBNJ instalada!"
-    );
-
-    if (installBtn) {
-
-      installBtn.style.display =
-        "none";
-
-    }
-
-  }
+```
+alert(
+  "📱 Aplicativo instalado com sucesso!"
 );
 
+console.log(
+  "BBNJ instalada!"
+);
+
+if (installBtn) {
+
+  installBtn.style.display =
+    "none";
+
+}
+```
+
+}
+);
 
 // =========================
 // FUNÇÕES AUXILIARES
 // =========================
 function atualizarTexto(
-  id,
-  valor
+id,
+valor
 ) {
 
-  const el =
-    document.getElementById(id);
+const el =
+document.getElementById(id);
 
-  if (el) {
+if (el) {
 
-    el.innerText =
-      valor ?? 0;
+```
+el.innerText =
+  valor ?? 0;
+```
 
-  }
+}
 
 }
 
 function renderLista(
-  containerId,
-  lista,
-  templateFn
+containerId,
+lista,
+templateFn
 ) {
 
-  const container =
-    document.getElementById(
-      containerId
+const container =
+document.getElementById(
+containerId
+);
+
+if (
+!container ||
+!Array.isArray(lista)
+) {
+return;
+}
+
+container.innerHTML = "";
+
+lista.forEach(
+(item, index) => {
+
+```
+  const wrapper =
+    document.createElement(
+      "div"
     );
 
-  if (
-    !container ||
-    !Array.isArray(lista)
-  ) {
-    return;
+  wrapper.innerHTML =
+    templateFn(item);
+
+  const element =
+    wrapper.firstElementChild;
+
+  if (element) {
+
+    element.style.animationDelay =
+      (index * 0.08) + "s";
+
+    container.appendChild(
+      element
+    );
+
   }
 
-  container.innerHTML = "";
+}
+```
 
-  lista.forEach(
-    (item, index) => {
-
-      const wrapper =
-        document.createElement(
-          "div"
-        );
-
-      wrapper.innerHTML =
-        templateFn(item);
-
-      const element =
-        wrapper.firstElementChild;
-
-      if (element) {
-
-        element.style.animationDelay =
-          (index * 0.08) + "s";
-
-        container.appendChild(
-          element
-        );
-
-      }
-
-    }
-  );
+);
 
 }
 
 function formatarData(
-  data
+data
 ) {
 
-  if (!data)
-    return "";
+if (!data)
+return "";
 
-  const d =
-    new Date(data);
+const d =
+new Date(data);
 
-  if (
-    isNaN(
-      d.getTime()
-    )
-  ) {
-    return data;
-  }
+if (
+isNaN(
+d.getTime()
+)
+) {
+return data;
+}
 
-  return d.toLocaleDateString(
-    "pt-BR"
-  );
+return d.toLocaleDateString(
+"pt-BR"
+);
 
 }
 
+// =========================
+// AUTO ATUALIZAÇÃO
+// =========================
+setInterval(() => {
+
+carregarDados();
+
+}, 300000);
 
 // =========================
 // INICIAR SITE
