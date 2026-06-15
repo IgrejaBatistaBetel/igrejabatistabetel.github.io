@@ -1,3 +1,11 @@
+// =======================================================
+// MOTOR DE NOTIFICAÇÕES (PUSHALERT)
+// =======================================================
+importScripts("https://cdn.pushalert.co/sw-89921.js");
+
+// =======================================================
+// CACHE DO PWA DA IGREJA (BBNJ)
+// =======================================================
 const CACHE_NAME = "bbnj-cache-v1";
 
 const urlsToCache = [
