@@ -1,228 +1,137 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BBNJ | Igreja Batista Betel Nova Jerusalém</title>
+    <title>BBNJ | Igreja Batista Betel Nova Jerusalém</title>
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D4AF37">
 
-<link rel="icon" href="favicon.png">
-
-<!-- PWA -->
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#D4AF37">
-
-<!-- OneSignal -->
-
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
-<script>
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-OneSignalDeferred.push(async function(OneSignal) {
-
-  await OneSignal.init({
-    appId: "8c9aba72-949e-428d-b1dc-fc8a5b84d393",
-    notifyButton: {
-      enable: false
-    }
-  });
-
-});
-</script>
+    <!-- PushAlert Unified Code -->
+    <script type="text/javascript">
+        (function(d, t) {
+            var g = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+            g.src = "https://cdn.pushalert.co/unified_ea39b5dc249569fab7af26e56b92b8d2.js";
+            s.parentNode.insertBefore(g, s);
+        }(document, "script"));
+    </script>
+    <!-- End PushAlert Unified Code -->
 
 </head>
-
 <body>
 
 <header class="navbar">
-
-<div class="logo-container">
-<img src="logo-dourada.png" alt="BBNJ Logo">
-<span>B.B.N.J.</span>
-</div>
-
-<nav>
-<a href="#inicio">Início</a>
-<a href="#sobre">Sobre Nós</a>
-<a href="#avisos">Avisos</a>
-<a href="#escala">Escala</a>
-<a href="#agenda">Agenda</a>
-<a href="#oracao">Oração</a>
-<a href="#contato">Contato</a>
-</nav>
-
+    <div class="logo-container">
+        <img src="logo-dourada.png" alt="BBNJ Logo">
+        <span>B.B.N.J.</span>
+    </div>
+    <nav>
+        <a href="#inicio">Início</a>
+        <a href="#sobre">Sobre Nós</a>
+        <a href="#avisos">Avisos</a>
+        <a href="#escala">Escala</a>
+        <a href="#agenda">Agenda</a>
+        <a href="#oracao">Oração</a>
+        <a href="#contato">Contato</a>
+    </nav>
 </header>
 
 <section class="hero" id="inicio">
-
-<img class="hero-logo" src="logo-dourada.png" alt="Logo BBNJ">
-
-<h1>Igreja Batista<br>Betel Nova Jerusalém</h1>
-
-<p>
-Edificados sobre o fundamento dos apóstolos e dos profetas,
-sendo Jesus Cristo a principal pedra angular.
-</p>
-
-<div class="hero-buttons">
-
-<a href="#avisos" class="btn-primary">
-📢 Avisos
-</a>
-
-<button
-id="installBtn"
-class="install-app">
-📱 Instalar App </button>
-
-<a
-href="https://maps.app.goo.gl/kNpgJ5amxod4sUjn8"
-target="_blank"
-class="btn-secondary">
-📍 Como Chegar </a>
-
-</div>
-
+    <img class="hero-logo" src="logo-dourada.png" alt="Logo BBNJ">
+    <h1>Igreja Batista<br>Betel Nova Jerusalém</h1>
+    <p>
+        Edificados sobre o fundamento dos apóstolos e dos profetas,
+        sendo Jesus Cristo a principal pedra angular.
+    </p>
+    <div class="hero-buttons">
+        <a href="#avisos" class="btn-primary">📢 Avisos</a>
+        <button id="installBtn" class="install-app">📱 Instalar App</button>
+        <a href="https://maps.app.goo.gl/kNpgJ5amxod4sUjn8" target="_blank" class="btn-secondary">📍 Como Chegar</a>
+    </div>
 </section>
 
 <section class="stats">
+    <div class="stat-card">
+        <h2 id="membros"></h2>
+        <p>Membros</p>
+    </div>
+    <div class="stat-card">
+        <h2 id="congregados"></h2>
+        <p>Congregados</p>
+    </div>
+    <div class="stat-card">
+        <h2 id="batizados"></h2>
+        <p>Batizados</p>
+    </div>
+</section>
 
-<div class="stat-card">
-<h2 id="membros"></h2>
-<p>Membros</p>
-</div>
-
-<div class="stat-card">
-<h2 id="congregados"></h2>
-<p>Congregados</p>
-</div>
-
-<div class="stat-card">
-<h2 id="batizados"></h2>
-<p>Batizados</p>
-</div>
-
-   </section>
-
-  <section id="sobre" class="section">
-
-  <h2>📖 Sobre Nós</h2>
-
-  <div id="sobre-container"></div>
-
+<section id="sobre" class="section">
+    <h2>📖 Sobre Nós</h2>
+    <div id="sobre-container"></div>
 </section>
 
 <section id="avisos" class="section">
-
-<h2>📢 Avisos</h2>
-
-<div id="avisos-container"></div>
-
+    <h2>📢 Avisos</h2>
+    <div id="avisos-container"></div>
 </section>
 
-   <section id="escala" class="section">
-
-<h2>📋 Escala Semanal</h2>
-
-<div id="escala-container"></div>
-
+<section id="escala" class="section">
+    <h2>📋 Escala Semanal</h2>
+    <div id="escala-container"></div>
 </section>
 
 <section id="agenda" class="section">
-
-<h2>📅 Agenda da Igreja</h2>
-
-<div id="agenda-container"></div>
-
+    <h2>📅 Agenda da Igreja</h2>
+    <div id="agenda-container"></div>
 </section>
 
 <section class="verse">
-
-<h2>📖 Versículo do dia</h2>
-
-<p id="versiculo"></p>
-
+    <h2>📖 Versículo do dia</h2>
+    <p id="versiculo"></p>
 </section>
 
 <section id="oracao" class="section">
-
-<h2>🙏 Pedido de Oração</h2>
-
-<form id="oracaoForm">
-
-<input
-type="text"
-id="nome"
-placeholder="Seu nome"
-required>
-
-<textarea
-id="pedido"
-placeholder="Digite seu pedido de oração"
-required></textarea>
-
-<button type="submit">
-Enviar Pedido
-</button>
-
-</form>
-
+    <h2>🙏 Pedido de Oração</h2>
+    <form id="oracaoForm">
+        <input type="text" id="nome" placeholder="Seu nome" required>
+        <textarea id="pedido" placeholder="Digite seu pedido de oração" required></textarea>
+        <button type="submit">Enviar Pedido</button>
+    </form>
 </section>
 
 <footer id="contato">
-
-<img src="logo-dourada.png" alt="Logo BBNJ">
-
-<h3>BBNJ</h3>
-
-<p>
-R. Monsenhor Sabino<br>
-Caiçara, Cruz - CE
-</p>
-
-<p>
-© 2026 Igreja Batista Betel Nova Jerusalém
-</p>
-
+    <img src="logo-dourada.png" alt="Logo BBNJ">
+    <h3>BBNJ</h3>
+    <p>
+        R. Monsenhor Sabino<br>
+        Caiçara, Cruz - CE
+    </p>
+    <p>
+        © 2026 Igreja Batista Betel Nova Jerusalém
+    </p>
 </footer>
 
 <script>
-
 if ("serviceWorker" in navigator) {
-
-  window.addEventListener("load", () => {
-
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then(reg => {
-
-        console.log(
-          "Service Worker registrado",
-          reg
-        );
-
-      })
-      .catch(err => {
-
-        console.error(
-          "Erro SW:",
-          err
-        );
-
-      });
-
-  });
-
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(reg => {
+                console.log("Service Worker registrado", reg);
+            })
+            .catch(err => {
+                console.error("Erro SW:", err);
+            });
+    });
 }
-
 </script>
 
 <script src="script.js"></script>
