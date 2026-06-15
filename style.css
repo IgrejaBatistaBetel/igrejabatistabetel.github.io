@@ -272,6 +272,20 @@ box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
 
 /* =========================
+   SOBRE NÓS (CORRIGIDO PARA QUEBRA DE LINHAS)
+========================= */
+
+#sobre-container {
+
+white-space: pre-wrap;
+
+line-height: 1.8;
+
+font-size: 1.1rem;
+
+}
+
+/* =========================
    VERSO
 ========================= */
 
@@ -442,7 +456,7 @@ box-shadow:
 }
 
 /* =========================
-   VERSÍCULO DA SEMANA
+   VERSÍCULO DA SEMANA (CORRIGIDO PARA QUEBRA DE LINHAS)
 ========================= */
 
 #versiculo{
@@ -468,6 +482,8 @@ border-left:
 4px solid var(--gold);
 
 transition:.6s ease;
+
+white-space: pre-wrap;
 
 }
 
