@@ -29,10 +29,17 @@ self.addEventListener("install", event => {
   );
 });
 
-// =========================
-// FETCH (intercepta requisições)
-// =========================
+// =======================================================
+// FETCH (INTERCEPTA COM FILTRO PARA NÃO TRAVAR O PUSH)
+// =======================================================
 self.addEventListener("fetch", event => {
+  const url = event.request.url;
+
+  // SE FOR REQUISIÇÃO DO PUSHALERT OU GOOGLE APIS, IGNORE O CACHE E DEIXE PASSAR DIRETO
+  if (url.includes("pushalert") || url.includes("google") || url.includes("gstatic")) {
+    return; // Não faz nada, deixa o navegador resolver direto com a internet
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
