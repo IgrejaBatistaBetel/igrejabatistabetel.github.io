@@ -1,7 +1,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
 
 // =======================================================
-// RENDERIZAR OS DADOS NA TELA
+// RENDERIZAR OS DADOS NA TELA (CORRIGIDO PARA NÃO CONFLITAR)
 // =======================================================
 function renderizarInterface(data) {
   if (!data) return;
@@ -72,32 +72,27 @@ function renderizarInterface(data) {
 // CARREGAR DADOS (MECÂNICA INSTANTÂNEA CACHE-FIRST)
 // =======================================================
 async function carregarDados() {
-  // 1. Tenta carregar IMEDIATAMENTE o que está salvo no celular do usuário
+  // 1. Carrega imediatamente o cache local para sumir o delay
   const cacheSalvo = localStorage.getItem("bbnj_dados_cache");
   if (cacheSalvo) {
     try {
-      const dadosAntigos = JSON.parse(cacheSalvo);
-      console.log("Carregado instantaneamente do Cache local");
-      renderizarInterface(dadosAntigos);
+      renderizarInterface(JSON.parse(cacheSalvo));
     } catch (e) {
-      console.error("Erro ao ler cache local", e);
+      console.error("Erro ao ler cache", e);
     }
   }
 
-  // 2. Busca os dados novos no Google Sheets em segundo plano
+  // 2. Busca dados novos sem travar a inicialização do site
   try {
     const response = await fetch(API_URL + "?nocache=" + Date.now());
     const dadosNovos = await response.json();
-    console.log("DADOS ATUALIZADOS DA API:", dadosNovos);
 
     if (dadosNovos && dadosNovos.status === "ok") {
-      // Salva a nova versão no celular para o próximo acesso
       localStorage.setItem("bbnj_dados_cache", JSON.stringify(dadosNovos));
-      // Atualiza a tela com os dados mais recentes da planilha
       renderizarInterface(dadosNovos);
     }
   } catch (error) {
-    console.error("Erro ao buscar dados novos da API:", error);
+    console.error("Erro API:", error);
   }
 }
 
@@ -131,7 +126,7 @@ if (form) {
         alert(result.message || "Não foi possível enviar.");
       }
     } catch (error) {
-      console.error("Erro ao enviar oração:", error);
+      console.error("Erro oração:", error);
       alert("😢 Erro ao enviar pedido.");
     }
   });
@@ -154,7 +149,6 @@ if (installBtn) {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    console.log("Instalação:", outcome);
     deferredPrompt = null;
     installBtn.style.display = "none";
   });
@@ -170,7 +164,7 @@ window.addEventListener("appinstalled", () => {
 // =========================
 function atualizarTexto(id, valor) {
   const el = document.getElementById(id);
-  if (el) el.innerText = valor ?? 0;
+  if (el) el.innerText = valor ?? "";
 }
 
 function renderLista(containerId, lista, templateFn) {
@@ -178,12 +172,11 @@ function renderLista(containerId, lista, templateFn) {
   if (!container || !Array.isArray(lista)) return;
 
   container.innerHTML = "";
-  lista.forEach((item, index) => {
+  lista.forEach((item) => {
     const wrapper = document.createElement("div");
     wrapper.innerHTML = templateFn(item);
     const element = wrapper.firstElementChild;
     if (element) {
-      element.style.animationDelay = (index * 0.04) + "s";
       container.appendChild(element);
     }
   });
@@ -196,14 +189,13 @@ function formatarData(data) {
   return d.toLocaleDateString("pt-BR");
 }
 
-// =========================
-// AUTO ATUALIZAÇÃO (A cada 5 minutos)
-// =========================
+// =======================================================
+// INICIALIZAÇÃO SEGURA (ESPERA O PUSH ALERT RESPIRAR)
+// =======================================================
+window.addEventListener("DOMContentLoaded", () => {
+  carregarDados();
+});
+
 setInterval(() => {
   carregarDados();
 }, 300000);
-
-// =========================
-// INICIAR SITE
-// =========================
-carregarDados();
