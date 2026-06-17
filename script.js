@@ -293,7 +293,6 @@ if (installBtn) {
     "click",
     async () => {
 
-      // Ativação forçada disparada por clique real (Evita bloqueio invisível do Android)
       if (typeof PushAlert !== "undefined") {
         console.log("Gatilho acionado pelo clique do usuário. Solicitando inscrição...");
         PushAlert.subscribe();
@@ -439,6 +438,35 @@ function formatarData(
   );
 
 }
+
+// =======================================================
+// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (BOTAO VERDE)
+// =======================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const btnNotificacao = document.getElementById("btnAtivarPush");
+  
+  if (btnNotificacao) {
+    btnNotificacao.addEventListener("click", () => {
+      console.log("Clique no botão de ativação de notificações.");
+      
+      if (typeof PushAlert !== "undefined") {
+        PushAlert.subscribe();
+      } else {
+        // Fallback nativo caso a biblioteca externa falhe ou demore
+        if ("Notification" in window) {
+          Notification.requestPermission().then(permission => {
+            console.log("Status da permissão nativa:", permission);
+            if (permission === "granted" && typeof PushAlert !== "undefined") {
+              PushAlert.subscribe();
+            }
+          });
+        } else {
+          alert("Este dispositivo ou navegador não possui suporte a notificações de sites. 😢");
+        }
+      }
+    });
+  }
+});
 
 // =========================
 // AUTO ATUALIZAÇÃO
