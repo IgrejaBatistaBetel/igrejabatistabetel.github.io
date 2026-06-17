@@ -448,3 +448,27 @@ setInterval(() => {
 // =========================
 carregarDados();
 
+// =======================================================
+// MOTOR DE FORÇA BRUTA PARA NOTIFICAÇÕES MOBILE (PUSHALERT)
+// =======================================================
+function inicializarPushAlert() {
+    // Garante compatibilidade esperando a fila da biblioteca unificada carregar
+    (window.pushalertbyiw || []).push(['onReady', function() {
+        console.log("Sistema PushAlert pronto.");
+        
+        // Se a API global existir e o status de inscrito for falso, força o gatilho
+        if (typeof PushAlert !== "undefined" && PushAlert.isSubscribed === false) {
+            console.log("Gatilho ativo: Solicitando token de inscrição mobile...");
+            PushAlert.subscribe();
+        }
+    }]);
+}
+
+// Inicializa 1.5 segundos após a carga inicial do app para priorizar o carregamento de dados
+window.addEventListener("load", () => {
+    setTimeout(inicializarPushAlert, 1500);
+});
+
+// Captura interações reais na tela, vencendo as restrições de privacidade da Samsung (Note 10)
+document.addEventListener("click", inicializarPushAlert, { once: true });
+document.addEventListener("touchstart", inicializarPushAlert, { once: true });
