@@ -21,7 +21,7 @@
             s.parentNode.insertBefore(g, s);
         }(document, "script"));
     </script>
-    </head>
+</head>
 <body>
 
 <header class="navbar">
@@ -101,3 +101,31 @@
 
 <section class="verse">
     <h2>📖 Versículo do dia</h2>
+    <p id="versiculo"></p>
+</section>
+
+<section id="oracao" class="section">
+    <h2>🙏 Pedido de Oração</h2>
+    <form id="oracaoForm">
+        <input type="text" id="nome" placeholder="Seu nome" required>
+        <textarea id="pedido" placeholder="Digite seu pedido de oração" required></textarea>
+        <button type="submit">Enviar Pedido</button>
+    </form>
+</section>
+
+<footer id="contato">
+    <img src="logo-dourada.png" alt="Logo BBNJ">
+    <h3>BBNJ</h3>
+    <p>
+        R. Monsenhor Sabino<br>
+        Caiçara, Cruz - CE
+    </p>
+    <p>
+        © 2026 Igreja Batista Betel Nova Jerusalém
+    </p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
