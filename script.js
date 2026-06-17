@@ -4,34 +4,20 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-I
 // CARREGAR DADOS
 // =========================
 async function carregarDados() {
-
   try {
-
     const response = await fetch(
       API_URL + "?nocache=" + Date.now()
     );
 
     const data = await response.json();
-
     console.log("DADOS API:", data);
 
     // =========================
     // ESTATÍSTICAS
     // =========================
-    atualizarTexto(
-      "membros",
-      data.estatisticas?.membros
-    );
-
-    atualizarTexto(
-      "congregados",
-      data.estatisticas?.congregados
-    );
-
-    atualizarTexto(
-      "batizados",
-      data.estatisticas?.batizados
-    );
+    atualizarTexto("membros", data.estatisticas?.membros);
+    atualizarTexto("congregados", data.estatisticas?.congregados);
+    atualizarTexto("batizados", data.estatisticas?.batizados);
 
     // =========================
     // AVISOS
@@ -66,35 +52,24 @@ async function carregarDados() {
     // =========================
     // ESCALA SEMANAL
     // =========================
-    const escalaContainer =
-      document.getElementById("escala-container");
+    const escalaContainer = document.getElementById("escala-container");
 
-    if (
-      escalaContainer &&
-      Array.isArray(data.escala)
-    ) {
-
+    if (escalaContainer && Array.isArray(data.escala)) {
       const grupos = {};
 
       data.escala.forEach(item => {
-
         if (!grupos[item.dia]) {
           grupos[item.dia] = [];
         }
-
         grupos[item.dia].push(item);
-
       });
 
       let htmlEscala = "";
 
       Object.keys(grupos).forEach(dia => {
-
         htmlEscala += `
           <div class="card escala-card">
-
             <h3>📅 ${dia}</h3>
-
             ${grupos[dia]
               .map(item => `
                 <p>
@@ -103,14 +78,11 @@ async function carregarDados() {
                 </p>
               `)
               .join("")}
-
           </div>
         `;
-
       });
 
       escalaContainer.innerHTML = htmlEscala;
-
     }
 
     // =========================
@@ -130,362 +102,138 @@ async function carregarDados() {
     // =========================
     // VERSÍCULO
     // =========================
-    const versiculo =
-      document.getElementById("versiculo");
+    const versiculo = document.getElementById("versiculo");
 
     if (versiculo && data.versiculo) {
-
       versiculo.style.opacity = 0;
-
       setTimeout(() => {
-
-        versiculo.innerText =
-          data.versiculo;
-
-        versiculo.style.transition =
-          "opacity .6s ease";
-
+        versiculo.innerText = data.versiculo;
+        versiculo.style.transition = "opacity .6s ease";
         versiculo.style.opacity = 1;
-
       }, 200);
-
     }
 
   } catch (error) {
-
-    console.error(
-      "Erro ao carregar dados:",
-      error
-    );
-
+    console.error("Erro ao carregar dados:", error);
   }
-
 }
 
 // =========================
 // ENVIO DE ORAÇÃO
 // =========================
-const form =
-  document.getElementById("oracaoForm");
+const form = document.getElementById("oracaoForm");
 
 if (form) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  form.addEventListener(
-    "submit",
-    async (e) => {
+    const nome = document.getElementById("nome").value.trim();
+    const pedido = document.getElementById("pedido").value.trim();
 
-      e.preventDefault();
-
-      const nome =
-        document.getElementById("nome")
-          .value
-          .trim();
-
-      const pedido =
-        document.getElementById("pedido")
-          .value
-          .trim();
-
-      if (!nome || !pedido) {
-
-        alert(
-          "Preencha todos os campos 🙏"
-        );
-
-        return;
-
-      }
-
-      try {
-
-        const response =
-          await fetch(API_URL, {
-
-            method: "POST",
-
-            body: JSON.stringify({
-              nome,
-              pedido
-            })
-
-          });
-
-        const texto =
-          await response.text();
-
-        console.log(
-          "Resposta bruta:",
-          texto
-        );
-
-        const result =
-          JSON.parse(texto);
-
-        if (
-          result.status === "ok"
-        ) {
-
-          alert(
-            "🙏 Pedido enviado com sucesso!"
-          );
-
-          form.reset();
-
-        } else {
-
-          alert(
-            result.message ||
-            "Não foi possível enviar."
-          );
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Erro ao enviar oração:",
-          error
-        );
-
-        alert(
-          "😢 Erro ao enviar pedido."
-        );
-
-      }
-
+    if (!nome || !pedido) {
+      alert("Preencha todos os campos 🙏");
+      return;
     }
 
-  );
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ nome, pedido })
+      });
 
+      const texto = await response.text();
+      console.log("Resposta bruta:", texto);
+      const result = JSON.parse(texto);
+
+      if (result.status === "ok") {
+        alert("🙏 Pedido enviado com sucesso!");
+        form.reset();
+      } else {
+        alert(result.message || "Não foi possível enviar.");
+      }
+
+    } catch (error) {
+      console.error("Erro ao enviar oração:", error);
+      alert("😢 Erro ao enviar pedido.");
+    }
+  });
 }
 
 // =========================
 // INSTALAR APP (PWA)
 // =========================
 let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
 
-const installBtn =
-  document.getElementById(
-    "installBtn"
-  );
-
-window.addEventListener(
-  "beforeinstallprompt",
-  (e) => {
-
-    e.preventDefault();
-
-    deferredPrompt = e;
-
-    if (installBtn) {
-
-      installBtn.style.display =
-        "inline-block";
-
-    }
-
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) {
+    installBtn.style.display = "inline-block";
   }
-);
+});
 
 if (installBtn) {
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
 
-  installBtn.addEventListener(
-    "click",
-    async () => {
-
-      if (!deferredPrompt)
-        return;
-
-      deferredPrompt.prompt();
-
-      const {
-        outcome
-      } =
-      await deferredPrompt.userChoice;
-
-      console.log(
-        "Instalação:",
-        outcome
-      );
-
-      deferredPrompt = null;
-
-      installBtn.style.display =
-        "none";
-
-    }
-  );
-
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log("Instalação:", outcome);
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  });
 }
 
-window.addEventListener(
-  "appinstalled",
-  () => {
-
-    alert(
-      "📱 Aplicativo instalado com sucesso!"
-    );
-
-    console.log(
-      "BBNJ instalada!"
-    );
-
-    if (installBtn) {
-
-      installBtn.style.display =
-        "none";
-
-    }
-
-  }
-);
-
-// =========================
-// FUNÇÕES AUXILIARES
-// =========================
-function atualizarTexto(
-  id,
-  valor
-) {
-
-  const el =
-    document.getElementById(id);
-
-  if (el) {
-
-    el.innerText =
-      valor ?? 0;
-
-  }
-
-}
-
-function renderLista(
-  containerId,
-  lista,
-  templateFn
-) {
-
-  const container =
-    document.getElementById(
-      containerId
-    );
-
-  if (
-    !container ||
-    !Array.isArray(lista)
-  ) {
-    return;
-  }
-
-  container.innerHTML = "";
-
-  lista.forEach(
-    (item, index) => {
-
-      const wrapper =
-        document.createElement(
-          "div"
-        );
-
-      wrapper.innerHTML =
-        templateFn(item);
-
-      const element =
-        wrapper.firstElementChild;
-
-      if (element) {
-
-        element.style.animationDelay =
-          (index * 0.08) + "s";
-
-        container.appendChild(
-          element
-        );
-
-      }
-
-    }
-  );
-
-}
-
-function formatarData(
-  data
-) {
-
-  if (!data)
-    return "";
-
-  const d =
-    new Date(data);
-
-  if (
-    isNaN(
-      d.getTime()
-    )
-  ) {
-    return data;
-  }
-
-  return d.toLocaleDateString(
-    "pt-BR"
-  );
-
-}
-
-// =======================================================
-// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (CORRIGIDO)
-// =======================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const btnNotificacao = document.getElementById("btnAtivarPush");
-  
-  if (btnNotificacao) {
-    btnNotificacao.addEventListener("click", () => {
-      console.log("Clique detectado! Chamando API oficial do PushAlert...");
-
-      // Garante a existência da fila global do PushAlert para evitar erros de sintaxe
-      window._paq = window._paq || [];
-
-      if ("Notification" in window) {
-        // Se o usuário já tiver bloqueado antes nas configurações, avisa o que fazer
-        if (Notification.permission === "denied") {
-          alert("As notificações estão bloqueadas no seu navegador. Para ativar, clique no cadeado ou ajuste ao lado do link e mude para 'Permitir'. ⚙️");
-          return;
-        }
-        
-        // Se já estiver permitido, avisa que já está tudo certo
-        if (Notification.permission === "granted") {
-          alert("Seu celular já está cadastrado para receber as notificações da igreja! 🔔");
-          // Re-inscreve por segurança na fila do servidor deles
-          window._paq.push(['openWidget']);
-          return;
-        }
-      }
-
-      // Método padrão e oficial para chamar o prompt de assinatura do PushAlert via botão customizado
-      try {
-        window._paq.push(['openWidget']);
-      } catch (err) {
-        console.error("Erro na fila do PushAlert, tentando fallback direto:", err);
-        if ("Notification" in window) {
-          Notification.requestPermission();
-        }
-      }
-    });
+window.addEventListener("appinstalled", () => {
+  alert("📱 Aplicativo instalado com sucesso!");
+  console.log("BBNJ instalada!");
+  if (installBtn) {
+    installBtn.style.display = "none";
   }
 });
 
 // =========================
-// AUTO ATUALIZAÇÃO
+// FUNÇÕES AUXILIARES
 // =========================
-setInterval(() => {
+function atualizarTexto(id, valor) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.innerText = valor ?? 0;
+  }
+}
 
-  carregarDados();
+function renderLista(containerId, lista, templateFn) {
+  const container = document.getElementById(containerId);
+  if (!container || !Array.isArray(lista)) return;
 
-}, 300000);
+  container.innerHTML = "";
 
-// =========================
-// INICIAR SITE
-// =========================
-carregarDados();
+  lista.forEach((item, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = templateFn(item);
+    const element = wrapper.firstElementChild;
+
+    if (element) {
+      element.style.animationDelay = (index * 0.08) + "s";
+      container.appendChild(element);
+    }
+  });
+}
+
+function formatarData(data) {
+  if (!data) return "";
+  const d = new Date(data);
+  if (isNaN(d.getTime())) {
+    return data;
+  }
+  return d.toLocaleDateString("pt-BR");
+}
+
+// =======================================================
+// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (RESTAURADO)
+// =======================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const btnNotificacao = document.getElementById("btnAtivarPush");
+  
+  if (btnNotific
