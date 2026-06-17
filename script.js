@@ -236,4 +236,34 @@ function formatarData(data) {
 document.addEventListener("DOMContentLoaded", () => {
   const btnNotificacao = document.getElementById("btnAtivarPush");
   
-  if (btnNotific
+  if (btnNotificacao) {
+    btnNotificacao.addEventListener("click", () => {
+      console.log("Gatilho acionado pelo clique do usuário. Solicitando inscrição...");
+      
+      window._paq = window._paq || [];
+
+      if ("Notification" in window && Notification.permission === "denied") {
+        alert("As notificações estão bloqueadas no seu navegador. Para ativar, clique no cadeado ou ajuste ao lado do link e mude para 'Permitir'. ⚙️");
+        return;
+      }
+
+      if (typeof PushAlert !== "undefined" && typeof PushAlert.subscribe === "function") {
+        PushAlert.subscribe();
+      } else {
+        window._paq.push(['openWidget']);
+      }
+    });
+  }
+});
+
+// =========================
+// AUTO ATUALIZAÇÃO
+// =========================
+setInterval(() => {
+  carregarDados();
+}, 300000);
+
+// =========================
+// INICIAR SITE
+// =========================
+carregarDados();
