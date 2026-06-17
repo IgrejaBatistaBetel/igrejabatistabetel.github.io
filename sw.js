@@ -1,66 +1,57 @@
 // =======================================================
-// MOTOR DE NOTIFICAÇÕES (PUSHALERT) - CHAVE CORRETA UNIFICADA
+// MOTOR DE NOTIFICAÇÕES (PUSHALERT) - LINK OFICIAL NUMÉRICO
 // =======================================================
-importScripts("https://cdn.pushalert.co/sw_ea39b5dc249569fab7af26e56b92b8d2.js");
+try {
+  importScripts("https://cdn.pushalert.co/sw-89921.js");
+} catch (e) {
+  console.error("Falha ao importar PushAlert:", e);
+}
 
 // =======================================================
-// CACHE DO PWA DA IGREJA (BBNJ) - VERSÃO ATUALIZADA
+// CACHE DO PWA DA IGREJA (BBNJ)
 // =======================================================
-const CACHE_NAME = "bbnj-cache-v2"; // Mudamos para v2 para forçar o reset do cache antigo
+const CACHE_NAME = "bbnj-cache-v4";
 
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/script.js",
-  "/logo-dourada.png",
-  "/favicon.png"
+  "./",
+  "./index.html",
+  "./style.css",
+  "./script.js",
+  "./logo-dourada.png",
+  "./favicon.png"
 ];
 
-// =========================
-// INSTALL (Instala o cache inicial)
-// =========================
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting()) // Força o novo sw a assumir o controle imediatamente
+      .then(() => self.skipWaiting())
   );
 });
 
-// =========================
-// ACTIVATE (Limpa o cache v1 antigo de forma agressiva)
-// =========================
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log("Removendo cache antigo:", key);
             return caches.delete(key);
           }
         })
       );
-    }).then(() => self.clients.claim()) // Ativa o sw em todas as abas e apps abertos na hora
+    }).then(() => self.clients.claim())
   );
 });
 
-// =========================
-// FETCH (Estratégia Network-First: Busca na internet primeiro)
-// =========================
 self.addEventListener("fetch", event => {
-  // Não intercepta requisições do PushAlert nem da API do Google Sheets
-  if (event.request.url.includes("pushalert.co") || event.request.url.includes("script.google.com")) {
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
-
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Se a internet respondeu, atualiza o cache com a cópia nova
         if (response && response.status === 200) {
           const responseCopy = response.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -70,7 +61,6 @@ self.addEventListener("fetch", event => {
         return response;
       })
       .catch(() => {
-        // Se a internet falhar (offline), busca o arquivo no cache
         return caches.match(event.request);
       })
   );
