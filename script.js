@@ -260,7 +260,7 @@ if (form) {
 }
 
 // =========================
-// INSTALAR APP (PWA)
+// INSTALAR APP (PWA) E ATIVAR NOTIFICAÇÕES
 // =========================
 let deferredPrompt;
 
@@ -292,6 +292,12 @@ if (installBtn) {
   installBtn.addEventListener(
     "click",
     async () => {
+
+      // Ativação forçada disparada por clique real (Evita bloqueio invisível do Android)
+      if (typeof PushAlert !== "undefined") {
+        console.log("Gatilho acionado pelo clique do usuário. Solicitando inscrição...");
+        PushAlert.subscribe();
+      }
 
       if (!deferredPrompt)
         return;
@@ -447,5 +453,3 @@ setInterval(() => {
 // INICIAR SITE
 // =========================
 carregarDados();
-
-
