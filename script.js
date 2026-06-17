@@ -260,7 +260,7 @@ if (form) {
 }
 
 // =========================
-// INSTALAR APP (PWA) E ATIVAR NOTIFICAÇÕES
+// INSTALAR APP (PWA)
 // =========================
 let deferredPrompt;
 
@@ -292,11 +292,6 @@ if (installBtn) {
   installBtn.addEventListener(
     "click",
     async () => {
-
-      if (typeof PushAlert !== "undefined") {
-        console.log("Gatilho acionado pelo clique do usuário. Solicitando inscrição...");
-        PushAlert.subscribe();
-      }
 
       if (!deferredPrompt)
         return;
@@ -440,28 +435,41 @@ function formatarData(
 }
 
 // =======================================================
-// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (BOTAO VERDE)
+// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (CORRIGIDO)
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
   const btnNotificacao = document.getElementById("btnAtivarPush");
   
   if (btnNotificacao) {
     btnNotificacao.addEventListener("click", () => {
-      console.log("Clique no botão de ativação de notificações.");
-      
-      if (typeof PushAlert !== "undefined") {
-        PushAlert.subscribe();
-      } else {
-        // Fallback nativo caso a biblioteca externa falhe ou demore
+      console.log("Clique detectado! Chamando API oficial do PushAlert...");
+
+      // Garante a existência da fila global do PushAlert para evitar erros de sintaxe
+      window._paq = window._paq || [];
+
+      if ("Notification" in window) {
+        // Se o usuário já tiver bloqueado antes nas configurações, avisa o que fazer
+        if (Notification.permission === "denied") {
+          alert("As notificações estão bloqueadas no seu navegador. Para ativar, clique no cadeado ou ajuste ao lado do link e mude para 'Permitir'. ⚙️");
+          return;
+        }
+        
+        // Se já estiver permitido, avisa que já está tudo certo
+        if (Notification.permission === "granted") {
+          alert("Seu celular já está cadastrado para receber as notificações da igreja! 🔔");
+          // Re-inscreve por segurança na fila do servidor deles
+          window._paq.push(['openWidget']);
+          return;
+        }
+      }
+
+      // Método padrão e oficial para chamar o prompt de assinatura do PushAlert via botão customizado
+      try {
+        window._paq.push(['openWidget']);
+      } catch (err) {
+        console.error("Erro na fila do PushAlert, tentando fallback direto:", err);
         if ("Notification" in window) {
-          Notification.requestPermission().then(permission => {
-            console.log("Status da permissão nativa:", permission);
-            if (permission === "granted" && typeof PushAlert !== "undefined") {
-              PushAlert.subscribe();
-            }
-          });
-        } else {
-          alert("Este dispositivo ou navegador não possui suporte a notificações de sites. 😢");
+          Notification.requestPermission();
         }
       }
     });
