@@ -11,6 +11,7 @@ const CACHE_NAME = "bbnj-cache-v4"; // Avançamos a versão para limpar os arqui
 const urlsToCache = [
   "./",
   "./index.html",
+  "./projetos.html",
   "./style.css",
   "./script.js?v=2.4", // Alinhado com a versão atual do seu index.html
   "./logo-dourada.png",
