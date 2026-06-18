@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossos Projetos - BBNJ</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Estilização complementar para manter o layout elegante e intercalado */
+    .projetos-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 40px;
+      color: var(--primary-color, #b59410); /* Usa o dourado do seu PWA ou padrão */
+      font-size: 2.2rem;
+    }
+
+    .projeto-item {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 60px;
+      background: var(--card-bg, #ffffff); /* Se adapta ao fundo do card atual */
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* O truque do CSS para intercalar automaticamente */
+    .projeto-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .projeto-img {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .projeto-img img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .projeto-info {
+      flex: 1.2;
+    }
+
+    .projeto-info h2 {
+      font-size: 1.8rem;
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: var(--title-color, #333);
+    }
+
+    .projeto-info p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text-color, #555);
+    }
+
+    /* Botão elegante para retornar à página inicial */
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 10px 18px;
+      background-color: var(--primary-color, #333);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: opacity 0.2s;
+    }
+    
+    .btn-voltar:hover {
+      opacity: 0.9;
+    }
+
+    /* Estado de carregamento bonito */
+    .loader {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    /* Ajuste perfeito para celulares */
+    @media (max-width: 768px) {
+      .projeto-item, .projeto-item:nth-child(even) {
+        flex-direction: column;
+        gap: 20px;
+        padding: 16px;
+      }
+      .projeto-img {
+        width: 100%;
+        min-width: 100%;
+      }
+      .projeto-img img {
+        height: 220px;
+      }
+      .projeto-info h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="projetos-container">
+    
+    <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
+
+    <h1 class="page-title">Nossos Projetos</h1>
+
+    <div id="projetos-container">
+      <div class="loader">Carregando projetos da comunidade...</div>
+    </div>
+
+  </div>
+
+  <script>
+    // LEMBRE-SE: Substitua pelo link atualizado da sua Nova Implantação do Apps Script
+    const API_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+
+    async function carregarProjetos() {
+      try {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        const container = document.getElementById("projetos-container");
+        
+        // Se a API responder sem projetos ou der erro na estrutura
+        if (!data.projetos || data.projetos.length === 0) {
+          container.innerHTML = "<div class='loader'>Nenhum projeto cadastrado no momento.</div>";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        data.projetos.forEach(p => {
+          const div = document.createElement("div");
+          div.className = "projeto-item";
+          div.innerHTML = `
+            <div class="projeto-img">
+              <img src="${p.urlImagem}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">
+            </div>
+            <div class="projeto-info">
+              <h2>${p.titulo}</h2>
+              <p>${p.descricao}</p>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar projetos:", error);
+        document.getElementById("projetos-container").innerHTML = "<div class='loader'>Erro ao carregar projetos. Verifique sua conexão.</div>";
+      }
+    }
+
+    carregarProjetos();
+  </script>
+</body>
+</html>
