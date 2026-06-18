@@ -231,27 +231,30 @@ function formatarData(data) {
 }
 
 // =======================================================
-// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (RESTAURADO)
+// GATILHO MANUAL DE PERMISSÃO DE NOTIFICAÇÕES (DIAGNÓSTICO)
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
   const btnNotificacao = document.getElementById("btnAtivarPush");
   
   if (btnNotificacao) {
     btnNotificacao.addEventListener("click", () => {
-      console.log("Gatilho acionado pelo clique do usuário. Solicitando inscrição...");
+      console.log("Iniciando processo de inscrição limpa...");
       
       window._paq = window._paq || [];
+
+      // Força o PushAlert a limpar tentativas travadas em cookies locais
+      window._paq.push(['_reset']);
 
       if ("Notification" in window && Notification.permission === "denied") {
         alert("As notificações estão bloqueadas no seu navegador. Para ativar, clique no cadeado ou ajuste ao lado do link e mude para 'Permitir'. ⚙️");
         return;
       }
 
-      if (typeof PushAlert !== "undefined" && typeof PushAlert.subscribe === "function") {
-        PushAlert.subscribe();
-      } else {
-        window._paq.push(['openWidget']);
-      }
+      // Dispara o widget oficial limpo
+      window._paq.push(['openWidget']);
+
+      // Alerta orientativo para o teste no Note 10 Plus
+      alert("Comando enviado! Por favor, aguarde de 5 a 10 segundos nesta página para que o navegador valide o token com o servidor do PushAlert.");
     });
   }
 });
