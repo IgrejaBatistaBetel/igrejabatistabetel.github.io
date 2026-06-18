@@ -4,73 +4,34 @@
 importScripts("https://cdn.pushalert.co/sw-89921.js");
 
 // =======================================================
-// CACHE DO PWA DA IGREJA (BBNJ)
+// CACHE DO PWA DA IGREJA (BBNJ) - VERSÃO ULTRA OFFLINE
 // =======================================================
-const CACHE_NAME = "bbnj-cache-v2"; // Mudamos a versão para forçar o Android a resetar
+const CACHE_NAME = "bbnj-cache-v4"; // Avançamos a versão para limpar os arquivos velhos
 
 const urlsToCache = [
   "./",
   "./index.html",
   "./style.css",
-  "./script.js?v=2.1", // Alinhado com a versão do seu index.html
+  "./script.js?v=2.4", // Alinhado com a versão atual do seu index.html
   "./logo-dourada.png",
   "./favicon.png"
 ];
 
-// =========================
-// INSTALL (Instala o PWA)
-// =========================
+// ==========================================
+// INSTALL - Guarda a estrutura no dispositivo
+// ==========================================
 self.addEventListener("install", event => {
   self.skipWaiting(); // Força o Service Worker novo a chutar o velho na hora
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-// =============================================================
-// FETCH (ESTRATÉGIA: NETWORK-FIRST - ESSENCIAL PARA NOTIFICAÇÕES)
-// =============================================================
-self.addEventListener("fetch", event => {
-  // Ignora requisições do PushAlert e da API do Google Sheets para não quebrar a integração
-  if (
-    event.request.url.includes("pushalert.co") || 
-    event.request.url.includes("script.google.com")
-  ) {
-    return; // Deixa passar direto pela internet, sem enfiar no cache
-  }
-
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Se a internet estiver boa, atualiza o cache com a cópia nova e entrega pro usuário
-        if (response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        // SE A INTERNET FALHAR (SÓ EM MODO OFFLINE), ele busca o que tem guardado no cache
-        return caches.match(event.request).then(cachedResponse => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Fallback básico caso nem o cache exista
-          if (event.request.mode === 'navigate') {
-            return caches.match("./index.html");
-          }
-        });
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log("PWA: Guardando estrutura essencial para uso offline...");
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
 // ==========================================
-// ACTIVATE (Deleta o lixo e o cache travado)
+// ACTIVATE - Limpa caches velhos da memória
 // ==========================================
 self.addEventListener("activate", event => {
   event.waitUntil(
@@ -80,12 +41,48 @@ self.addEventListener("activate", event => {
         return Promise.all(
           keys.map(key => {
             if (key !== CACHE_NAME) {
-              console.log("Removendo cache antigo travado:", key);
+              console.log("Removendo cache antigo:", key);
               return caches.delete(key);
             }
           })
         );
       })
     ])
+  );
+});
+
+// =======================================================================
+// FETCH - ESTRATÉGIA STALE-WHILE-REVALIDATE (PERFEITA PARA MODO OFFLINE)
+// =======================================================================
+self.addEventListener("fetch", event => {
+  // Ignora requisições do PushAlert e da API do Google Sheets para não quebrar a integração
+  if (
+    event.request.url.includes("pushalert.co") || 
+    event.request.url.includes("script.google.com")
+  ) {
+    return; // Deixa passar direto pela internet, sem enfiar no cache
+  }
+
+  // Para os arquivos estruturais do site, entrega o cache na hora e atualiza depois
+  event.respondWith(
+    caches.match(event.request).then(cachedResponse => {
+      
+      // Cria a busca na rede em segundo plano para atualizar o app silenciosamente
+      const fetchPromise = fetch(event.request).then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      }).catch(() => {
+        // Falha silenciosa se estiver totalmente sem rede
+        console.log("PWA funcionando em modo offline.");
+      });
+
+      // Retorna o arquivo do cache imediatamente (se existir). Se não existir, espera a rede.
+      return cachedResponse || fetchPromise;
+    })
   );
 });
