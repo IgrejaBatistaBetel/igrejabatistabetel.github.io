@@ -7,100 +7,153 @@
   <link rel="stylesheet" href="style.css">
   
   <style>
-    /* Estilização complementar para manter o layout elegante e intercalado */
+    /* =======================================================
+       DESIGN MODERNO E FLUIDO (INTERFACE PREMIUM)
+       ======================================================= */
+    body {
+      background: linear-gradient(135deg, #f9f9fb 0%, #eef1f6 100%);
+      min-height: 100vh;
+    }
+
     .projetos-container {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
     }
 
     .page-title {
-      text-align: center;
-      margin-bottom: 40px;
-      color: var(--primary-color, #b59410); /* Usa o dourado do seu PWA ou padrão */
-      font-size: 2.2rem;
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--primary-color, #b59410);
+      margin-bottom: 10px;
     }
 
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Card com efeito de suavidade e transição */
     .projeto-item {
       display: flex;
       align-items: center;
-      gap: 40px;
-      margin-bottom: 60px;
-      background: var(--card-bg, #ffffff); /* Se adapta ao fundo do card atual */
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      gap: 50px;
+      margin-bottom: 80px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px); /* Efeito vidro fosco sutil */
+      -webkit-backdrop-filter: blur(10px);
+      padding: 35px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
     }
 
-    /* O truque do CSS para intercalar automaticamente */
+    /* Animação de flutuação ao passar o mouse */
+    .projeto-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Intercalação automática inteligente */
     .projeto-item:nth-child(even) {
       flex-direction: row-reverse;
     }
 
+    /* Container da Imagem */
     .projeto-img {
       flex: 1;
-      min-width: 280px;
+      min-width: 320px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
     }
 
     .projeto-img img {
       width: 100%;
-      height: 280px;
+      height: 320px;
       object-fit: cover;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Efeito de zoom suave na foto ao passar o mouse no card */
+    .projeto-item:hover .projeto-img img {
+      transform: scale(1.05);
+    }
+
+    /* Bloco de Informações */
     .projeto-info {
-      flex: 1.2;
+      flex: 1.3;
     }
 
     .projeto-info h2 {
-      font-size: 1.8rem;
+      font-size: 2rem;
+      font-weight: 700;
       margin-top: 0;
-      margin-bottom: 12px;
-      color: var(--title-color, #333);
+      margin-bottom: 16px;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
     }
 
     .projeto-info p {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: var(--text-color, #555);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #4a4a4a;
     }
 
-    /* Botão elegante para retornar à página inicial */
+    /* Botão Voltar Minimalista */
     .btn-voltar {
       display: inline-flex;
       align-items: center;
-      margin-bottom: 30px;
-      padding: 10px 18px;
-      background-color: var(--primary-color, #333);
-      color: #fff;
+      gap: 8px;
+      margin-bottom: 40px;
+      padding: 12px 24px;
+      background: #ffffff;
+      color: #333;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.95rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: opacity 0.2s;
+      border-radius: 30px; /* Estilo pílula, mais moderno */
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.05);
     }
     
     .btn-voltar:hover {
-      opacity: 0.9;
+      background: #333;
+      color: #fff;
+      transform: translateX(-3px);
     }
 
-    /* Estado de carregamento bonito */
     .loader {
       text-align: center;
-      padding: 40px;
-      font-size: 1.2rem;
-      color: #666;
+      padding: 50px;
+      font-size: 1.1rem;
+      color: #888;
+      font-weight: 500;
     }
 
-    /* Ajuste perfeito para celulares */
+    /* Celulares e Tablets */
     @media (max-width: 768px) {
+      .projetos-container {
+        padding: 30px 15px;
+      }
+      .page-title {
+        font-size: 2rem;
+      }
       .projeto-item, .projeto-item:nth-child(even) {
         flex-direction: column;
-        gap: 20px;
-        padding: 16px;
+        gap: 25px;
+        padding: 20px;
+        margin-bottom: 40px;
       }
       .projeto-img {
         width: 100%;
@@ -110,7 +163,7 @@
         height: 220px;
       }
       .projeto-info h2 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
       }
     }
   </style>
@@ -119,18 +172,23 @@
 
   <div class="projetos-container">
     
-    <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
+    <a href="index.html" class="btn-voltar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Voltar ao Início
+    </a>
 
-    <h1 class="page-title">Nossos Projetos</h1>
+    <div class="page-header">
+      <h1 class="page-title">Nossos Projetos</h1>
+      <p class="page-subtitle">Conheça as ações, ministérios e trabalhos desenvolvidos por nossa comunidade.</p>
+    </div>
 
     <div id="projetos-container">
-      <div class="loader">Carregando projetos da comunidade...</div>
+      <div class="loader">Buscando projetos atualizados...</div>
     </div>
 
   </div>
 
   <script>
-    // LEMBRE-SE: Substitua pelo link atualizado da sua Nova Implantação do Apps Script
     const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
 
     async function carregarProjetos() {
@@ -139,7 +197,6 @@
         const data = await resp.json();
         const container = document.getElementById("projetos-container");
         
-        // Se a API responder sem projetos ou der erro na estrutura
         if (!data.projetos || data.projetos.length === 0) {
           container.innerHTML = "<div class='loader'>Nenhum projeto cadastrado no momento.</div>";
           return;
@@ -163,7 +220,7 @@
         });
       } catch (error) {
         console.error("Erro ao carregar projetos:", error);
-        document.getElementById("projetos-container").innerHTML = "<div class='loader'>Erro ao carregar projetos. Verifique sua conexão.</div>";
+        document.getElementById("projetos-container").innerHTML = "<div class='loader'>Não foi possível carregar os projetos. Verifique a sua ligação à internet.</div>";
       }
     }
 
