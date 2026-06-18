@@ -8,11 +8,14 @@
   
   <style>
     /* =======================================================
-       DESIGN MODERNO E FLUIDO (INTERFACE PREMIUM)
+       INTEGRAÇÃO COM A PALETA DE CORES ORIGINAL DO SITE
        ======================================================= */
     body {
-      background: linear-gradient(135deg, #f9f9fb 0%, #eef1f6 100%);
+      /* Usa o fundo padrão do seu PWA. Se não achar, usa o escuro/padrão */
+      background: var(--bg-color, #121212); 
+      color: var(--text-color, #ffffff);
       min-height: 100vh;
+      margin: 0;
     }
 
     .projetos-container {
@@ -30,39 +33,45 @@
       font-size: 2.6rem;
       font-weight: 800;
       letter-spacing: -1px;
-      color: var(--primary-color, #b59410);
+      /* Usa a cor principal/dourada do seu site */
+      color: var(--primary-color, #b59410); 
       margin-bottom: 10px;
     }
 
     .page-subtitle {
       font-size: 1.1rem;
-      color: #666;
+      /* Ajusta a opacidade do texto para se adaptar tanto a fundos claros quanto escuros */
+      color: var(--text-color, #ffffff);
+      opacity: 0.8;
       max-width: 600px;
       margin: 0 auto;
     }
 
-    /* Card com efeito de suavidade e transição */
+    /* Card integrado à identidade visual */
     .projeto-item {
       display: flex;
       align-items: center;
       gap: 50px;
       margin-bottom: 80px;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px); /* Efeito vidro fosco sutil */
+      /* Usa o fundo de card do seu site ou uma alternativa semi-transparente */
+      background: var(--card-bg, rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       padding: 35px;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      /* Se o site for escuro, a borda sutil ajuda a destacar o card */
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s;
     }
 
-    /* Animação de flutuação ao passar o mouse */
     .projeto-item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary-color, #b59410);
     }
 
-    /* Intercalação automática inteligente */
+    /* Intercalação automática */
     .projeto-item:nth-child(even) {
       flex-direction: row-reverse;
     }
@@ -73,7 +82,7 @@
       min-width: 320px;
       overflow: hidden;
       border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     }
 
     .projeto-img img {
@@ -84,7 +93,6 @@
       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Efeito de zoom suave na foto ao passar o mouse no card */
     .projeto-item:hover .projeto-img img {
       transform: scale(1.05);
     }
@@ -99,37 +107,38 @@
       font-weight: 700;
       margin-top: 0;
       margin-bottom: 16px;
-      color: #1a1a1a;
+      color: var(--title-color, var(--primary-color, #ffffff));
       letter-spacing: -0.5px;
     }
 
     .projeto-info p {
       font-size: 1.05rem;
       line-height: 1.7;
-      color: #4a4a4a;
+      color: var(--text-color, #ffffff);
+      opacity: 0.9;
     }
 
-    /* Botão Voltar Minimalista */
+    /* Botão Voltar Dinâmico */
     .btn-voltar {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 40px;
       padding: 12px 24px;
-      background: #ffffff;
-      color: #333;
+      background: var(--card-bg, rgba(255, 255, 255, 0.1));
+      color: var(--text-color, #ffffff);
       text-decoration: none;
-      border-radius: 30px; /* Estilo pílula, mais moderno */
+      border-radius: 30px;
       font-weight: 600;
       font-size: 0.9rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: all 0.2s ease;
-      border: 1px solid rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     }
     
     .btn-voltar:hover {
-      background: #333;
-      color: #fff;
+      background: var(--primary-color, #b59410);
+      color: #000000; /* Texto escuro se o botão virar dourado */
       transform: translateX(-3px);
     }
 
@@ -137,7 +146,8 @@
       text-align: center;
       padding: 50px;
       font-size: 1.1rem;
-      color: #888;
+      color: var(--text-color, #ffffff);
+      opacity: 0.6;
       font-weight: 500;
     }
 
@@ -189,7 +199,8 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
+    // LEMBRE-SE: Insira o link da implantação ativa do seu Apps Script
+    const API_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
 
     async function carregarProjetos() {
       try {
