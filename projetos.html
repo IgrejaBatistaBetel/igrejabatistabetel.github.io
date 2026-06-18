@@ -116,6 +116,7 @@
       line-height: 1.7;
       color: var(--text-color, #ffffff);
       opacity: 0.9;
+      white-space: pre-wrap; /* Garante que mantém espaços e quebras de linha da planilha */
     }
 
     /* Botão Voltar Dinâmico */
@@ -199,7 +200,6 @@
   </div>
 
   <script>
-    // LEMBRE-SE: Insira o link da implantação ativa do seu Apps Script
     const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
 
     async function carregarProjetos() {
