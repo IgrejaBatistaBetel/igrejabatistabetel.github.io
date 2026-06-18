@@ -1,120 +1,143 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
+const CACHE_KEY = "bbnj_dados_cache";
 
-// =========================
-// CARREGAR DADOS
-// =========================
+// ==========================================
+// RENDERIZAR OS DADOS NA TELA
+// ==========================================
+function renderizarLayout(data) {
+  if (!data) return;
+
+  // =========================
+  // ESTATÍSTICAS
+  // =========================
+  atualizarTexto("membros", data.estatisticas?.membros);
+  atualizarTexto("congregados", data.estatisticas?.congregados);
+  atualizarTexto("batizados", data.estatisticas?.batizados);
+
+  // =========================
+  // AVISOS
+  // =========================
+  renderLista(
+    "avisos-container",
+    data.avisos,
+    (aviso) => `
+      <div class="card">
+        <strong>${aviso.titulo}</strong><br>
+        📅 ${formatarData(aviso.data)}
+        ${aviso.hora ? `<br>🕒 ${aviso.hora}` : ""}
+      </div>
+    `
+  );
+
+  // =========================
+  // AGENDA
+  // =========================
+  renderLista(
+    "agenda-container",
+    data.agenda,
+    (item) => `
+      <div class="card">
+        <strong>${item.evento}</strong><br>
+        📅 ${item.dia}
+        ${item.hora ? `<br>🕒 ${item.hora}` : ""}
+      </div>
+    `
+  );
+
+  // =========================
+  // ESCALA SEMANAL
+  // =========================
+  const escalaContainer = document.getElementById("escala-container");
+
+  if (escalaContainer && Array.isArray(data.escala)) {
+    const grupos = {};
+
+    data.escala.forEach(item => {
+      if (!grupos[item.dia]) {
+        grupos[item.dia] = [];
+      }
+      grupos[item.dia].push(item);
+    });
+
+    let htmlEscala = "";
+
+    Object.keys(grupos).forEach(dia => {
+      htmlEscala += `
+        <div class="card escala-card">
+          <h3>📅 ${dia}</h3>
+          ${grupos[dia]
+            .map(item => `
+              <p>
+                <strong>${item.funcao}:</strong>
+                ${item.responsavel}
+              </p>
+            `)
+            .join("")}
+        </div>
+      `;
+    });
+
+    escalaContainer.innerHTML = htmlEscala;
+  }
+
+  // =========================
+  // SOBRE NÓS
+  // =========================
+  renderLista(
+    "sobre-container",
+    data.sobreNos,
+    (item) => `
+      <div class="card">
+        <h3>${item.titulo}</h3>
+        <p>${item.conteudo}</p>
+      </div>
+    `
+  );
+
+  // =========================
+  // VERSÍCULO
+  // =========================
+  const versiculo = document.getElementById("versiculo");
+
+  if (versiculo && data.versiculo) {
+    versiculo.innerText = data.versiculo;
+    versiculo.style.opacity = 1;
+  }
+}
+
+// ==========================================
+// CARREGAR DADOS (MECÂNICA INSTANTÂNEA)
+// ==========================================
 async function carregarDados() {
+  // 1. TENTA CARREGAR DO CACHE LOCAL IMEDIATAMENTE (ZERO DELAY)
+  const cacheSalvo = localStorage.getItem(CACHE_KEY);
+  if (cacheSalvo) {
+    try {
+      const dadosAntigos = JSON.parse(cacheSalvo);
+      console.log("Exibindo dados do cache instantâneo...");
+      renderizarLayout(dadosAntigos);
+    } catch (e) {
+      console.error("Erro ao ler cache local:", e);
+    }
+  }
+
+  // 2. BUSCA NA API EM SEGUNDO PLANO PARA ATUALIZAR CASO PRECISE
   try {
     const response = await fetch(
       API_URL + "?nocache=" + Date.now()
     );
 
     const data = await response.json();
-    console.log("DADOS API:", data);
+    console.log("DADOS API ATUALIZADOS:", data);
 
-    // =========================
-    // ESTATÍSTICAS
-    // =========================
-    atualizarTexto("membros", data.estatisticas?.membros);
-    atualizarTexto("congregados", data.estatisticas?.congregados);
-    atualizarTexto("batizados", data.estatisticas?.batizados);
+    // Salva o novo resultado na memória para a próxima visita do usuário
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
 
-    // =========================
-    // AVISOS
-    // =========================
-    renderLista(
-      "avisos-container",
-      data.avisos,
-      (aviso) => `
-        <div class="card">
-          <strong>${aviso.titulo}</strong><br>
-          📅 ${formatarData(aviso.data)}
-          ${aviso.hora ? `<br>🕒 ${aviso.hora}` : ""}
-        </div>
-      `
-    );
-
-    // =========================
-    // AGENDA
-    // =========================
-    renderLista(
-      "agenda-container",
-      data.agenda,
-      (item) => `
-        <div class="card">
-          <strong>${item.evento}</strong><br>
-          📅 ${item.dia}
-          ${item.hora ? `<br>🕒 ${item.hora}` : ""}
-        </div>
-      `
-    );
-
-    // =========================
-    // ESCALA SEMANAL
-    // =========================
-    const escalaContainer = document.getElementById("escala-container");
-
-    if (escalaContainer && Array.isArray(data.escala)) {
-      const grupos = {};
-
-      data.escala.forEach(item => {
-        if (!grupos[item.dia]) {
-          grupos[item.dia] = [];
-        }
-        grupos[item.dia].push(item);
-      });
-
-      let htmlEscala = "";
-
-      Object.keys(grupos).forEach(dia => {
-        htmlEscala += `
-          <div class="card escala-card">
-            <h3>📅 ${dia}</h3>
-            ${grupos[dia]
-              .map(item => `
-                <p>
-                  <strong>${item.funcao}:</strong>
-                  ${item.responsavel}
-                </p>
-              `)
-              .join("")}
-          </div>
-        `;
-      });
-
-      escalaContainer.innerHTML = htmlEscala;
-    }
-
-    // =========================
-    // SOBRE NÓS
-    // =========================
-    renderLista(
-      "sobre-container",
-      data.sobreNos,
-      (item) => `
-        <div class="card">
-          <h3>${item.titulo}</h3>
-          <p>${item.conteudo}</p>
-        </div>
-      `
-    );
-
-    // =========================
-    // VERSÍCULO
-    // =========================
-    const versiculo = document.getElementById("versiculo");
-
-    if (versiculo && data.versiculo) {
-      versiculo.style.opacity = 0;
-      setTimeout(() => {
-        versiculo.innerText = data.versiculo;
-        versiculo.style.transition = "opacity .6s ease";
-        versiculo.style.opacity = 1;
-      }, 200);
-    }
+    // Atualiza o layout discretamente com os dados novos da planilha
+    renderizarLayout(data);
 
   } catch (error) {
-    console.error("Erro ao carregar dados:", error);
+    console.error("Erro ao carregar dados da API em background:", error);
   }
 }
 
