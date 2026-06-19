@@ -201,40 +201,74 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
+    const LOCAL_STORAGE_KEY = "bbnj_projetos_cache";
+
+    // Função interna que gera o HTML dos projetos na tela
+    function renderizarProjetos(projetos) {
+      const container = document.getElementById("projetos-container");
+      container.innerHTML = "";
+
+      projetos.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "projeto-item";
+        div.innerHTML = `
+          <div class="projeto-img">
+            <img src="${p.urlImagem}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">
+          </div>
+          <div class="projeto-info">
+            <h2>${p.titulo}</h2>
+            <p>${p.descricao}</p>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
 
     async function carregarProjetos() {
+      const container = document.getElementById("projetos-container");
+      
+      // 1. CARREGA IMEDIATAMENTE O CONTEÚDO SALVO DO ÚLTIMO ACESSO
+      const cacheSalvo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let dadosAntigosStr = "";
+
+      if (cacheSalvo) {
+        try {
+          const dadosCache = JSON.parse(cacheSalvo);
+          if (dadosCache && dadosCache.length > 0) {
+            renderizarProjetos(dadosCache);
+            dadosAntigosStr = cacheSalvo; 
+          }
+        } catch(e) {
+          console.error("Erro ao ler cache local:", e);
+        }
+      }
+
+      // 2. REQUISITA EM SEGUNDO PLANO OS DADOS DA PLANILHA GOOGLE
       try {
         const resp = await fetch(API_URL);
         const data = await resp.json();
-        const container = document.getElementById("projetos-container");
         
-        if (!data.projetos || data.projetos.length === 0) {
+        if (data.projetos && data.projetos.length > 0) {
+          const novosDadosStr = JSON.stringify(data.projetos);
+          
+          // 3. SE HOUVER ALTERAÇÃO EM RELAÇÃO AO CACHE, ATUALIZA A TELA FLUIDAMENTE
+          if (novosDadosStr !== dadosAntigosStr) {
+            renderizarProjetos(data.projetos);
+            localStorage.setItem(LOCAL_STORAGE_KEY, novosDadosStr);
+          }
+        } else if (!cacheSalvo) {
           container.innerHTML = "<div class='loader'>Nenhum projeto cadastrado no momento.</div>";
-          return;
         }
-
-        container.innerHTML = "";
-
-        data.projetos.forEach(p => {
-          const div = document.createElement("div");
-          div.className = "projeto-item";
-          div.innerHTML = `
-            <div class="projeto-img">
-              <img src="${p.urlImagem}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">
-            </div>
-            <div class="projeto-info">
-              <h2>${p.titulo}</h2>
-              <p>${p.descricao}</p>
-            </div>
-          `;
-          container.appendChild(div);
-        });
       } catch (error) {
-        console.error("Erro ao carregar projetos:", error);
-        document.getElementById("projetos-container").innerHTML = "<div class='loader'>Não foi possível carregar os projetos. Verifique a sua ligação à internet.</div>";
+        console.error("Erro ao atualizar dados em segundo plano:", error);
+        // Exibe erro de rede somente se o usuário nunca entrou antes e não possui cache local
+        if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
+          document.getElementById("projetos-container").innerHTML = "<div class='loader'>Não foi possível carregar os projetos. Verifique a sua ligação à internet.</div>";
+        }
       }
     }
 
+    // Executa a função imediatamente ao carregar a página
     carregarProjetos();
   </script>
 </body>
