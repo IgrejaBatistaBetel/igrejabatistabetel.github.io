@@ -11,11 +11,7 @@
   <link rel="stylesheet" href="style.css">
   
   <style>
-    /* =======================================================
-       INTEGRAÇÃO COM A PALETA DE CORES ORIGINAL DO SITE
-       ======================================================= */
     body {
-      /* Puxa o fundo oficial do site. Se falhar, usa o azul escuro padrão do BBNJ */
       background: var(--bg-color, #0f172a); 
       color: var(--text-color, #ffffff);
       min-height: 100vh;
@@ -38,7 +34,6 @@
       font-size: 2.6rem;
       font-weight: 800;
       letter-spacing: -1px;
-      /* Usa a cor principal/dourada do seu site */
       color: var(--primary-color, #b59410); 
       margin-bottom: 10px;
     }
@@ -51,15 +46,11 @@
       margin: 0 auto;
     }
 
-    /* =======================================================
-       EFEITO DE ANIMAÇÃO AO ENTRAR NA PÁGINA (TEXTO SUBINDO)
-       ======================================================= */
     .animar-suave {
       animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       opacity: 0;
     }
     
-    /* Pequeno atraso no subtítulo para um efeito mais refinado */
     .page-subtitle.animar-suave {
       animation-delay: 0.15s;
     }
@@ -75,7 +66,6 @@
       }
     }
 
-    /* Card integrado à identidade visual */
     .projeto-item {
       display: flex;
       align-items: center;
@@ -89,8 +79,6 @@
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s;
-      
-      /* Aplica a mesma animação de subida aos cards ao carregar */
       animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       opacity: 0;
     }
@@ -101,33 +89,44 @@
       border-color: var(--primary-color, #b59410);
     }
 
-    /* Intercalação automática */
     .projeto-item:nth-child(even) {
       flex-direction: row-reverse;
     }
 
-    /* Container da Imagem */
+    /* =======================================================
+       ESTRUTURA DO CARROSSEL MULTI-IMAGENS
+       ======================================================= */
     .projeto-img {
       flex: 1;
       min-width: 320px;
+      height: 320px;
       overflow: hidden;
       border-radius: 16px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      position: relative; /* Necessário para sobrepor as imagens */
     }
 
     .projeto-img img {
       width: 100%;
-      height: 320px;
+      height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0; /* Começam escondidas */
+      transition: opacity 1.2s ease-in-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .projeto-item:hover .projeto-img img {
-      transform: scale(1.05);
+    /* A imagem que tiver a classe .active fica visível */
+    .projeto-img img.active {
+      opacity: 1;
     }
 
-    /* Bloco de Informações */
+    .projeto-item:hover .projeto-img img.active {
+      transform: scale(1.04);
+    }
+
     .projeto-info {
       flex: 1.3;
     }
@@ -149,7 +148,6 @@
       white-space: pre-wrap; 
     }
 
-    /* Botão Voltar Dinâmico */
     .btn-voltar {
       display: inline-flex;
       align-items: center;
@@ -182,30 +180,17 @@
       font-weight: 500;
     }
 
-    /* Celulares e Tablets */
     @media (max-width: 768px) {
-      .projetos-container {
-        padding: 30px 15px;
-      }
-      .page-title {
-        font-size: 2rem;
-      }
+      .projetos-container { padding: 30px 15px; }
+      .page-title { font-size: 2rem; }
       .projeto-item, .projeto-item:nth-child(even) {
         flex-direction: column;
         gap: 25px;
         padding: 20px;
         margin-bottom: 40px;
       }
-      .projeto-img {
-        width: 100%;
-        min-width: 100%;
-      }
-      .projeto-img img {
-        height: 220px;
-      }
-      .projeto-info h2 {
-        font-size: 1.6rem;
-      }
+      .projeto-img { width: 100%; min-width: 100%; height: 240px; }
+      .projeto-info h2 { font-size: 1.6rem; }
     }
   </style>
 </head>
@@ -232,21 +217,35 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
     const LOCAL_STORAGE_KEY = "bbnj_projetos_cache";
+    let intervaloCarrossel = null;
 
     function renderizarProjetos(projetos) {
       const container = document.getElementById("projetos-container");
       container.innerHTML = "";
+      
+      // Para limpar temporizadores anteriores se a API atualizar em tempo real
+      if(intervaloCarrossel) clearInterval(intervaloCarrossel);
 
       projetos.forEach((p, index) => {
         const div = document.createElement("div");
         div.className = "projeto-item";
-        
-        // Aplica um atraso (delay) dinâmico baseado na ordem do card para o efeito cascata
         div.style.animationDelay = `${(index + 1) * 0.15}s`;
         
+        // Se não houver imagens cadastradas, usa uma padrão do Unsplash
+        const listaImagens = (p.urlsImagens && p.urlsImagens.length > 0) 
+          ? p.urlsImagens 
+          : ['https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500'];
+
+        // Cria as tags <img> agrupadas. A primeira ganha a classe 'active'
+        let imgHtml = "";
+        listaImagens.forEach((url, imgIndex) => {
+          const classeAtiva = imgIndex === 0 ? "active" : "";
+          imgHtml += `<img src="${url}" class="${classeAtiva}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">`;
+        });
+
         div.innerHTML = `
           <div class="projeto-img">
-            <img src="${p.urlImagem}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">
+            ${imgHtml}
           </div>
           <div class="projeto-info">
             <h2>${p.titulo}</h2>
@@ -255,6 +254,39 @@
         `;
         container.appendChild(div);
       });
+
+      // INICIA O MOTOR DE TROCA DE IMAGENS AUTOMÁTICO
+      iniciarCarrossel();
+    }
+
+    function iniciarCarrossel() {
+      intervaloCarrossel = setInterval(() => {
+        // Encontra todos os containers de imagem dos projetos na tela
+        const containers = document.querySelectorAll(".projeto-img");
+        
+        containers.forEach(container => {
+          const imagens = container.querySelectorAll("img");
+          if (imagens.length <= 1) return; // Se só tem 1 imagem, não faz nada
+          
+          let indiceAtivo = 0;
+          
+          // Acha qual imagem está aparecendo agora
+          imagens.forEach((img, i) => {
+            if (img.classList.contains("active")) {
+              indiceAtivo = i;
+            }
+          });
+          
+          // Remove a classe da atual
+          imagens[indiceAtivo].classList.remove("active");
+          
+          // Calcula a próxima (se chegou no fim, volta para a 0)
+          let proximoIndice = (indiceAtivo + 1) % imagens.length;
+          
+          // Adiciona a classe para surgir com fade suave
+          imagens[proximoIndice].classList.add("active");
+        });
+      }, 4000); // 4000ms = 4 segundos por foto
     }
 
     async function carregarProjetos() {
