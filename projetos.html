@@ -67,7 +67,7 @@
     @keyframes subirEAgrupar {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
@@ -89,6 +89,10 @@
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s;
+      
+      /* Aplica a mesma animação de subida aos cards ao carregar */
+      animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
     }
 
     .projeto-item:hover {
@@ -233,9 +237,13 @@
       const container = document.getElementById("projetos-container");
       container.innerHTML = "";
 
-      projetos.forEach(p => {
+      projetos.forEach((p, index) => {
         const div = document.createElement("div");
         div.className = "projeto-item";
+        
+        // Aplica um atraso (delay) dinâmico baseado na ordem do card para o efeito cascata
+        div.style.animationDelay = `${(index + 1) * 0.15}s`;
+        
         div.innerHTML = `
           <div class="projeto-img">
             <img src="${p.urlImagem}" alt="${p.titulo}" onerror="this.src='https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500';">
