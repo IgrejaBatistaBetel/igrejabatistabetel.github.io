@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nossos Projetos - BBNJ</title>
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  
   <link rel="stylesheet" href="style.css">
   
   <style>
@@ -11,11 +15,12 @@
        INTEGRAÇÃO COM A PALETA DE CORES ORIGINAL DO SITE
        ======================================================= */
     body {
-      /* Usa o fundo padrão do seu PWA. Se não achar, usa o escuro/padrão */
-      background: var(--bg-color, #121212); 
+      /* Puxa o fundo oficial do site. Se falhar, usa o azul escuro padrão do BBNJ */
+      background: var(--bg-color, #0f172a); 
       color: var(--text-color, #ffffff);
       min-height: 100vh;
       margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     .projetos-container {
@@ -40,7 +45,6 @@
 
     .page-subtitle {
       font-size: 1.1rem;
-      /* Ajusta a opacidade do texto para se adaptar tanto a fundos claros quanto escuros */
       color: var(--text-color, #ffffff);
       opacity: 0.8;
       max-width: 600px;
@@ -53,13 +57,11 @@
       align-items: center;
       gap: 50px;
       margin-bottom: 80px;
-      /* Usa o fundo de card do seu site ou uma alternativa semi-transparente */
       background: var(--card-bg, rgba(255, 255, 255, 0.05));
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       padding: 35px;
       border-radius: 20px;
-      /* Se o site for escuro, a borda sutil ajuda a destacar o card */
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s;
@@ -116,7 +118,7 @@
       line-height: 1.7;
       color: var(--text-color, #ffffff);
       opacity: 0.9;
-      white-space: pre-wrap; /* Garante que mantém espaços e quebras de linha da planilha */
+      white-space: pre-wrap; 
     }
 
     /* Botão Voltar Dinâmico */
@@ -139,7 +141,7 @@
     
     .btn-voltar:hover {
       background: var(--primary-color, #b59410);
-      color: #000000; /* Texto escuro se o botão virar dourado */
+      color: #000000; 
       transform: translateX(-3px);
     }
 
@@ -203,7 +205,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
     const LOCAL_STORAGE_KEY = "bbnj_projetos_cache";
 
-    // Função interna que gera o HTML dos projetos na tela
     function renderizarProjetos(projetos) {
       const container = document.getElementById("projetos-container");
       container.innerHTML = "";
@@ -226,8 +227,6 @@
 
     async function carregarProjetos() {
       const container = document.getElementById("projetos-container");
-      
-      // 1. CARREGA IMEDIATAMENTE O CONTEÚDO SALVO DO ÚLTIMO ACESSO
       const cacheSalvo = localStorage.getItem(LOCAL_STORAGE_KEY);
       let dadosAntigosStr = "";
 
@@ -243,7 +242,6 @@
         }
       }
 
-      // 2. REQUISITA EM SEGUNDO PLANO OS DADOS DA PLANILHA GOOGLE
       try {
         const resp = await fetch(API_URL);
         const data = await resp.json();
@@ -251,7 +249,6 @@
         if (data.projetos && data.projetos.length > 0) {
           const novosDadosStr = JSON.stringify(data.projetos);
           
-          // 3. SE HOUVER ALTERAÇÃO EM RELAÇÃO AO CACHE, ATUALIZA A TELA FLUIDAMENTE
           if (novosDadosStr !== dadosAntigosStr) {
             renderizarProjetos(data.projetos);
             localStorage.setItem(LOCAL_STORAGE_KEY, novosDadosStr);
@@ -261,14 +258,12 @@
         }
       } catch (error) {
         console.error("Erro ao atualizar dados em segundo plano:", error);
-        // Exibe erro de rede somente se o usuário nunca entrou antes e não possui cache local
         if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
           document.getElementById("projetos-container").innerHTML = "<div class='loader'>Não foi possível carregar os projetos. Verifique a sua ligação à internet.</div>";
         }
       }
     }
 
-    // Executa a função imediatamente ao carregar a página
     carregarProjetos();
   </script>
 </body>
