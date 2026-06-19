@@ -51,6 +51,30 @@
       margin: 0 auto;
     }
 
+    /* =======================================================
+       EFEITO DE ANIMAÇÃO AO ENTRAR NA PÁGINA (TEXTO SUBINDO)
+       ======================================================= */
+    .animar-suave {
+      animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+    
+    /* Pequeno atraso no subtítulo para um efeito mais refinado */
+    .page-subtitle.animar-suave {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes subirEAgrupar {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     /* Card integrado à identidade visual */
     .projeto-item {
       display: flex;
@@ -191,8 +215,8 @@
     </a>
 
     <div class="page-header">
-      <h1 class="page-title">Nossos Projetos</h1>
-      <p class="page-subtitle">Conheça as ações, ministérios e trabalhos desenvolvidos por nossa comunidade.</p>
+      <h1 class="page-title animar-suave">Nossos Projetos</h1>
+      <p class="page-subtitle animar-suave">Conheça as ações, ministérios e trabalhos desenvolvidos por nossa comunidade.</p>
     </div>
 
     <div id="projetos-container">
