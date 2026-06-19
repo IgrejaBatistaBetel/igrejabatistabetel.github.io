@@ -11,7 +11,6 @@ function renderizarLayout(data) {
   // ESTATÍSTICAS
   // =========================
   atualizarTexto("membros", data.estatisticas?.membros);
-  atualizarTexto("congregados", data.estatisticas?.congregados);
   atualizarTexto("batizados", data.estatisticas?.batizados);
 
   // =========================
