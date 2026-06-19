@@ -180,6 +180,9 @@
       font-weight: 500;
     }
 
+    /* =======================================================
+       CORREÇÃO DO CARROSSEL DE IMAGENS MOBILE
+       ======================================================= */
     @media (max-width: 768px) {
       .projetos-container { padding: 30px 15px; }
       .page-title { font-size: 2rem; }
@@ -189,7 +192,18 @@
         padding: 20px;
         margin-bottom: 40px;
       }
-      .projeto-img { width: 100%; min-width: 100%; height: 240px; }
+      .projeto-img { 
+        width: 100%; 
+        min-width: 100%; 
+        height: 240px; 
+        position: relative;
+      }
+      /* Garante que as imagens sob o carrossel absoluto herdem a proporção correta */
+      .projeto-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
       .projeto-info h2 { font-size: 1.6rem; }
     }
   </style>
@@ -223,7 +237,6 @@
       const container = document.getElementById("projetos-container");
       container.innerHTML = "";
       
-      // Para limpar temporizadores anteriores se a API atualizar em tempo real
       if(intervaloCarrossel) clearInterval(intervaloCarrossel);
 
       projetos.forEach((p, index) => {
@@ -231,12 +244,10 @@
         div.className = "projeto-item";
         div.style.animationDelay = `${(index + 1) * 0.15}s`;
         
-        // Se não houver imagens cadastradas, usa uma padrão do Unsplash
         const listaImagens = (p.urlsImagens && p.urlsImagens.length > 0) 
           ? p.urlsImagens 
           : ['https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=500'];
 
-        // Cria as tags <img> agrupadas. A primeira ganha a classe 'active'
         let imgHtml = "";
         listaImagens.forEach((url, imgIndex) => {
           const classeAtiva = imgIndex === 0 ? "active" : "";
@@ -255,38 +266,30 @@
         container.appendChild(div);
       });
 
-      // INICIA O MOTOR DE TROCA DE IMAGENS AUTOMÁTICO
       iniciarCarrossel();
     }
 
     function iniciarCarrossel() {
       intervaloCarrossel = setInterval(() => {
-        // Encontra todos os containers de imagem dos projetos na tela
         const containers = document.querySelectorAll(".projeto-img");
         
         containers.forEach(container => {
           const imagens = container.querySelectorAll("img");
-          if (imagens.length <= 1) return; // Se só tem 1 imagem, não faz nada
+          if (imagens.length <= 1) return;
           
           let indiceAtivo = 0;
           
-          // Acha qual imagem está aparecendo agora
           imagens.forEach((img, i) => {
             if (img.classList.contains("active")) {
               indiceAtivo = i;
             }
           });
           
-          // Remove a classe da atual
           imagens[indiceAtivo].classList.remove("active");
-          
-          // Calcula a próxima (se chegou no fim, volta para a 0)
           let proximoIndice = (indiceAtivo + 1) % imagens.length;
-          
-          // Adiciona a classe para surgir com fade suave
           imagens[proximoIndice].classList.add("active");
         });
-      }, 4000); // 4000ms = 4 segundos por foto
+      }, 4000);
     }
 
     async function carregarProjetos() {
