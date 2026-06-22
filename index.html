@@ -23,6 +23,145 @@
             s.parentNode.insertBefore(g, s);
         }(document, "script"));
     </script>
+
+    <style>
+        /* =======================================================
+           ESTRUTURA DO MENU HAMBÚRGUER E SIDEBAR (BARRA LATERAL)
+           ======================================================= */
+        
+        /* Ajuste na Navbar antiga para virar um flexbox limpo */
+        header.navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            box-sizing: border-box;
+        }
+
+        /* Estilo dos 3 links que ficarão fixos do lado de fora */
+        .nav-links-fixos {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links-fixos a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links-fixos a:hover {
+            color: var(--primary-color, #b59410);
+        }
+
+        /* O Botão de 3 Tracinhos (Hambúrguer) */
+        .menu-hamburguer {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .menu-hamburguer span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Animação do botão virando "X" quando aberto */
+        .menu-hamburguer.aberto span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        .menu-hamburguer.aberto span:nth-child(2) {
+            opacity: 0;
+        }
+        .menu-hamburguer.aberto span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* A Barra Lateral Oculta (Sidebar) */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            right: -300px; /* Começa escondida para fora da tela */
+            width: 300px;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 100px 30px 30px 30px;
+            box-sizing: border-box;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Quando ativo, ela desliza para dentro da tela */
+        .sidebar-menu.ativo {
+            right: 0;
+        }
+
+        /* Links de navegação dentro da Barra Lateral */
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .sidebar-links a:hover {
+            color: var(--primary-color, #d4af37);
+            padding-left: 8px;
+        }
+
+        /* Fundo escurecido atrás do menu ao abrir */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.ativo {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Responsivo: Esconde os links externos fixos em telas muito pequenas */
+        @media (max-width: 600px) {
+            .nav-links-fixos {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -31,18 +170,38 @@
         <img src="logo-dourada.png" alt="BBNJ Logo">
         <span>B.B.N.J.</span>
     </div>
-    <nav>
+    
+    <!-- Lado Direito: Links Fixos Externos + Menu Hambúrguer -->
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <nav class="nav-links-fixos">
+            <a href="#sobre">Sobre Nós</a>
+            <a href="projetos.html">Projetos</a>
+            <a href="#contato">Contato</a>
+        </nav>
+
+        <button class="menu-hamburguer" id="btn-menu" aria-label="Abrir Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+<!-- GAVETA DO MENU LATERAL -->
+<div class="sidebar-overlay" id="menu-overlay"></div>
+<div class="sidebar-menu" id="sidebar-gaveta">
+    <nav class="sidebar-links">
         <a href="#inicio">Início</a>
         <a href="#sobre">Sobre Nós</a>
-        <a href="projetos.html" class="menu-item">Projetos</a>
-        <a href="memorias.html" class="menu-item">Memórias</a>
+        <a href="projetos.html">Projetos</a>
+        <a href="memorias.html">📸 Memórias</a>
         <a href="#avisos">Avisos</a>
-        <a href="#escala">Escala</a>
-        <a href="#agenda">Agenda</a>
-        <a href="#oracao">Oração</a>
+        <a href="#escala">Escala Semanal</a>
+        <a href="#agenda">Agenda da Igreja</a>
+        <a href="#oracao">Pedidos de Oração</a>
         <a href="#contato">Contato</a>
     </nav>
-</header>
+</div>
 
 <section class="hero" id="inicio">
     <img class="hero-logo" src="logo-dourada.png" alt="Logo BBNJ">
@@ -88,8 +247,6 @@
     <a href="https://maps.app.goo.gl/kNpgJ5amxod4sUjn8" target="_blank" class="btn-secondary" style="width: auto; max-width: 280px; text-align: center;">📍 Nossa Localização</a>
 </div>
 
-        </section>
-
 <section id="avisos" class="section">
     <h2>📢 Avisos</h2>
     <div id="avisos-container"></div>
@@ -132,6 +289,32 @@
 </footer>
 
 <script src="script.js?v=2.4"></script>
+
+<!-- MECANISMO DE ACIONAMENTO DO MENU LATERAL -->
+<script>
+    const btnMenu = document.getElementById('btn-menu');
+    const sidebar = document.getElementById('sidebar-gaveta');
+    const overlay = document.getElementById('menu-overlay');
+    const linksSidebar = document.querySelectorAll('.sidebar-links a');
+
+    function alternarMenu() {
+        btnMenu.classList.toggle('aberto');
+        sidebar.classList.toggle('ativo');
+        overlay.classList.toggle('ativo');
+    }
+
+    btnMenu.addEventListener('click', alternarMenu);
+    overlay.addEventListener('click', alternarMenu);
+
+    // Fecha a barra lateral automaticamente se clicar em alguma âncora da página interna
+    linksSidebar.forEach(link => {
+        link.addEventListener('click', () => {
+            btnMenu.classList.remove('aberto');
+            sidebar.classList.remove('ativo');
+            overlay.classList.remove('ativo');
+        });
+    });
+</script>
 
 </body>
 </html>
