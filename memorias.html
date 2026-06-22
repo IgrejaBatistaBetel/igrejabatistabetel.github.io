@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossas Memórias - BBNJ</title>
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    body {
+      background: var(--bg-color, #0f172a); 
+      color: var(--text-color, #ffffff);
+      min-height: 100vh;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .galeria-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .page-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--primary-color, #b59410); 
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-color, #ffffff);
+      opacity: 0.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .animar-suave {
+      animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+    
+    .page-subtitle.animar-suave {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes subirEAgrupar {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =======================================================
+       ESTRUTURA DA GALERIA EM GRID (MOSAICO DE MEMÓRIAS)
+       ======================================================= */
+    .galeria-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .memoria-card {
+      background: var(--card-bg, rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s;
+      animation: subirEAgrupar 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .memoria-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary-color, #b59410);
+    }
+
+    /* CARROSSEL DE IMAGENS INTERNO */
+    .memoria-img-box {
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .memoria-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .memoria-img-box img.active {
+      opacity: 1;
+    }
+
+    .memoria-card:hover .memoria-img-box img.active {
+      transform: scale(1.04);
+    }
+
+    /* INFORMAÇÕES DO TEXTO */
+    .memoria-info {
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .memoria-info h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: var(--title-color, var(--primary-color, #ffffff));
+      letter-spacing: -0.3px;
+    }
+
+    .memoria-info p {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text-color, #ffffff);
+      opacity: 0.85;
+      margin: 0;
+      white-space: pre-wrap; 
+    }
+
+    /* BOTÃO VOLTAR */
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 40px;
+      padding: 12px 24px;
+      background: var(--card-bg, rgba(255, 255, 255, 0.1));
+      color: var(--text-color, #ffffff);
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    }
+    
+    .btn-voltar:hover {
+      background: var(--primary-color, #b59410);
+      color: #000000; 
+      transform: translateX(-3px);
+    }
+
+    .loader {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.1rem;
+      color: var(--text-color, #ffffff);
+      opacity: 0.6;
+      font-weight: 500;
+      grid-column: 1 / -1;
+    }
+
+    /* RESPONSIVIDADE MOBILE */
+    @media (max-width: 768px) {
+      .galeria-container { padding: 30px 15px; }
+      .page-title { font-size: 2rem; }
+      .galeria-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+      .memoria-img-box { 
+        height: 220px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="galeria-container">
+    
+    <a href="index.html" class="btn-voltar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Voltar ao Início
+    </a>
+
+    <div class="page-header">
+      <h1 class="page-title animar-suave">Nossas Memórias</h1>
+      <p class="page-subtitle animar-suave">Momentos especiais marcados na história da nossa comunidade.</p>
+    </div>
+
+    <div id="galeria-grid" class="galeria-grid">
+      <div class="loader">Buscando memórias atualizadas...</div>
+    </div>
+
+  </div>
+
+  <script>
+    // IMPORTANTE: Altere esta URL caso as memórias fiquem em outra aba ou outra WebApp do Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbzpcnCO3S3JUi-1ti8qYI-IzXCR8wVvJOeKNz1JGHPQntZu7l1skEAth4ZKcKA5gIXe/exec";
+    const LOCAL_STORAGE_KEY = "bbnj_memorias_cache";
+    let intervaloCarrossel = null;
+
+    function renderizarMemorias(memorias) {
+      const grid = document.getElementById("galeria-grid");
+      grid.innerHTML = "";
+      
+      if(intervaloCarrossel) clearInterval(intervaloCarrossel);
+
+      memorias.forEach((m, index) => {
+        const card = document.createElement("div");
+        card.className = "memoria-card";
+        card.style.animationDelay = `${(index + 1) * 0.12}s`;
+        
+        // Verifica imagens. Se vazio, usa um placeholder bonito
+        const listaImagens = (m.urlsImagens && m.urlsImagens.length > 0) 
+          ? m.urlsImagens 
+          : ['https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600'];
+
+        let imgHtml = "";
+        listaImagens.forEach((url, imgIndex) => {
+          const classeAtiva = imgIndex === 0 ? "active" : "";
+          imgHtml += `<img src="${url}" class="${classeAtiva}" alt="${m.titulo}" onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600';">`;
+        });
+
+        // Só exibe a descrição se ela realmente existir na planilha
+        const descricaoHtml = m.descricao ? `<p>${m.descricao}</p>` : "";
+
+        card.innerHTML = `
+          <div class="memoria-img-box">
+            ${imgHtml}
+          </div>
+          <div class="memoria-info">
+            <h2>${m.titulo}</h2>
+            ${descricaoHtml}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      iniciarCarrossel();
+    }
+
+    function iniciarCarrossel() {
+      intervaloCarrossel = setInterval(() => {
+        const containers = document.querySelectorAll(".memoria-img-box");
+        
+        containers.forEach(container => {
+          const imagens = container.querySelectorAll("img");
+          if (imagens.length <= 1) return;
+          
+          let indiceAtivo = 0;
+          
+          imagens.forEach((img, i) => {
+            if (img.classList.contains("active")) {
+              indiceAtivo = i;
+            }
+          });
+          
+          imagens[indiceAtivo].classList.remove("active");
+          let proximoIndice = (indiceAtivo + 1) % imagens.length;
+          imagens[proximoIndice].classList.add("active");
+        });
+      }, 4000); // Rotaciona a cada 4 segundos
+    }
+
+    async function carregarMemorias() {
+      const grid = document.getElementById("galeria-grid");
+      const cacheSalvo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let dadosAntigosStr = "";
+
+      if (cacheSalvo) {
+        try {
+          const dadosCache = JSON.parse(cacheSalvo);
+          if (dadosCache && dadosCache.length > 0) {
+            renderizarMemorias(dadosCache);
+            dadosAntigosStr = cacheSalvo; 
+          }
+        } catch(e) {
+          console.error("Erro ao ler cache de memórias:", e);
+        }
+      }
+
+      try {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        
+        // Adaptação: caso sua planilha use "memorias" em vez de "projetos" no retorno JSON
+        const listaDados = data.memorias || data.projetos;
+
+        if (listaDados && listaDados.length > 0) {
+          const novosDadosStr = JSON.stringify(listaDados);
+          
+          if (novosDadosStr !== dadosAntigosStr) {
+            renderizarMemorias(listaDados);
+            localStorage.setItem(LOCAL_STORAGE_KEY, novosDadosStr);
+          }
+        } else if (!cacheSalvo) {
+          grid.innerHTML = "<div class='loader'>Nenhuma memória cadastrada no momento.</div>";
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar memórias:", error);
+        if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
+          grid.innerHTML = "<div class='loader'>Não foi possível carregar a galeria. Verifique a sua conexão.</div>";
+        }
+      }
+    }
+
+    carregarMemorias();
+  </script>
+</body>
+</html>
