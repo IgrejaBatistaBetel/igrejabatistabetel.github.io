@@ -172,6 +172,11 @@
                 display: none !important;
             }
 
+            /* REMOVE O BOTÃO HAMBÚRGUER DO TOPO NO CELULAR */
+            .menu-hamburguer {
+                display: none !important;
+            }
+
             /* Ativa e estiliza a barra mobile na base */
             .bottom-nav {
                 display: flex;
@@ -257,13 +262,11 @@
         <span>B.B.N.J.</span>
     </div>
     
-    <!-- Lado Direito: Links Fixos Externos + Menu Hambúrguer -->
+    <!-- Lado Direito: Links Fixos Externos + Menu Hambúrguer (Some no mobile) -->
     <div style="display: flex; align-items: center; gap: 20px;">
         <nav class="nav-links-fixos">
-            <a href="#inicio">Início</a>
             <a href="#sobre">Sobre Nós</a>
             <a href="projetos.html">Projetos</a>
-            <a href="memorias.html">Memórias</a>
             <a href="#contato">Contato</a>
         </nav>
 
@@ -391,13 +394,14 @@
         overlay.classList.toggle('ativo');
     }
 
-    btnMenu.addEventListener('click', alternarMenu);
-    overlay.addEventListener('click', alternarMenu);
+    // Mantemos os eventos funcionando normalmente tanto para cliques no PC quanto para chamadas do botão inferior
+    if(btnMenu) btnMenu.addEventListener('click', alternarMenu);
+    if(overlay) overlay.addEventListener('click', alternarMenu);
 
     // Fecha a barra lateral automaticamente se clicar em alguma âncora da página interna
     linksSidebar.forEach(link => {
         link.addEventListener('click', () => {
-            btnMenu.classList.remove('aberto');
+            if(btnMenu) btnMenu.classList.remove('aberto');
             sidebar.classList.remove('ativo');
             overlay.classList.remove('ativo');
         });
