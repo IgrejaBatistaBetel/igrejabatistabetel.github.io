@@ -350,9 +350,20 @@
     <div id="agenda-container"></div>
 </section>
 
-<section class="verse">
+<!-- SEÇÃO DO VERSÍCULO REESTRUTURADA COM O SININHO -->
+<section class="verse" id="versiculo" style="position: relative; padding: 40px 20px; text-align: center;">
     <h2>📖 Versículo do dia</h2>
-    <p id="versiculo"></p>
+    <p id="versiculo" style="font-style: italic; margin-bottom: 20px; min-height: 24px;">Carregando o versículo de hoje...</p>
+    
+    <!-- Botão de Preferência (Sininho) -->
+    <div class="preferencia-notificacao" style="margin-top: 15px;">
+        <button id="btnSininhoVersiculo" onclick="alternarSubcanalVersiculo()" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.4); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.88rem; transition: all 0.3s ease;">
+            <svg id="iconeSininho" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span id="textoSininho">Verificando preferências...</span>
+        </button>
+    </div>
 </section>
 
 <section id="oracao" class="section">
@@ -391,11 +402,9 @@
         overlay.classList.toggle('ativo');
     }
 
-    // Mantemos os eventos funcionando normalmente tanto para cliques no PC quanto para chamadas do botão inferior
     if(btnMenu) btnMenu.addEventListener('click', alternarMenu);
     if(overlay) overlay.addEventListener('click', alternarMenu);
 
-    // Fecha a barra lateral automaticamente se clicar em alguma âncora da página interna
     linksSidebar.forEach(link => {
         link.addEventListener('click', () => {
             if(btnMenu) btnMenu.classList.remove('aberto');
@@ -403,6 +412,71 @@
             overlay.classList.remove('ativo');
         });
     });
+</script>
+
+<!-- CONTROLE DOS SUBCANAIS DO PUSHALERT (VERSÍCULO DIÁRIO) -->
+<script>
+    // Executa assim que a API do PushAlert carregar por completo no navegador
+    window.addEventListener('pushalertReady', function(e) {
+        atualizarLayoutSininho();
+    });
+
+    function atualizarLayoutSininho() {
+        const btn = document.getElementById('btnSininhoVersiculo');
+        const texto = document.getElementById('textoSininho');
+        const icone = document.getElementById('iconeSininho');
+        
+        if (typeof PushAlert !== 'undefined' && PushAlert.isUserSubscribed) {
+            // Verifica o estado atual da assinatura do subcanal
+            PushAlert.isUserSubscribedToSubchannel("versiculo", function(estaInscrito) {
+                if (estaInscrito) {
+                    btn.style.backgroundColor = "rgba(40, 167, 69, 0.15)";
+                    btn.style.borderColor = "#28a745";
+                    texto.innerText = "Recebendo Versículo Diário";
+                    icone.setAttribute("fill", "#28a745");
+                } else {
+                    btn.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
+                    btn.style.borderColor = "rgba(212, 175, 55, 0.4)";
+                    texto.innerText = "Versículo Diário Silenciado";
+                    icone.setAttribute("fill", "none");
+                }
+            });
+        } else {
+            texto.innerText = "Ativar Versículo Diário";
+            icone.setAttribute("fill", "none");
+        }
+    }
+
+    function alternarSubcanalVersiculo() {
+        if (typeof PushAlert === 'undefined') return;
+
+        // Se o usuário ainda não ativou as notificações gerais do site, faz o convite principal primeiro
+        if (!PushAlert.isUserSubscribed) {
+            PushAlert.subscribe(function(result) {
+                if(result === "success") {
+                    PushAlert.subscribeToSubchannel("versiculo", function(status) {
+                        atualizarLayoutSininho();
+                    });
+                }
+            });
+            return;
+        }
+
+        // Se já for assinante geral, gerencia individualmente o subcanal do versículo
+        PushAlert.isUserSubscribedToSubchannel("versiculo", function(estaInscrito) {
+            if (estaInscrito) {
+                PushAlert.unsubscribeFromSubchannel("versiculo", function(status) {
+                    atualizarLayoutSininho();
+                    alert("Notificações do Versículo desativadas! Você continuará recebendo avisos e escalas importantes normalmente. 🙏");
+                });
+            } else {
+                PushAlert.subscribeToSubchannel("versiculo", function(status) {
+                    atualizarLayoutSininho();
+                    alert("Inscrição confirmada! Você passará a receber o Versículo do Dia. 📖");
+                });
+            }
+        });
+    }
 </script>
 
 </body>
