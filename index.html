@@ -160,7 +160,7 @@
         }
 
         /* =======================================================
-           BARRA DE NAVEGAÇÃO INFERIOR (ESTILO APP MOBILE)
+            BARRA DE NAVEGAÇÃO INFERIOR (ESTILO APP MOBILE)
            ======================================================= */
         .bottom-nav {
             display: none;
@@ -350,18 +350,18 @@
     <div id="agenda-container"></div>
 </section>
 
-<!-- SEÇÃO DO VERSÍCULO REESTRUTURADA COM O SININHO -->
-<section class="verse" id="versiculo" style="position: relative; padding: 40px 20px; text-align: center;">
+<!-- SEÇÃO DO VERSÍCULO CORRIGIDA (SEM IDS DUPLICADOS E COM EXIBIÇÃO FORÇADA) -->
+<section class="verse" id="versiculo" style="position: relative; padding: 40px 20px; text-align: center; display: block !important;">
     <h2>📖 Versículo do dia</h2>
-    <p id="versiculo" style="font-style: italic; margin-bottom: 20px; min-height: 24px;">Carregando o versículo de hoje...</p>
+    <p id="textoVersiculo" style="font-style: italic; margin-bottom: 20px; min-height: 24px; display: block !important;">Carregando o versículo de hoje...</p>
     
     <!-- Botão de Preferência (Sininho) -->
-    <div class="preferencia-notificacao" style="margin-top: 15px;">
-        <button id="btnSininhoVersiculo" onclick="alternarSubcanalVersiculo()" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.4); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.88rem; transition: all 0.3s ease;">
-            <svg id="iconeSininho" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <div class="preferencia-notificacao" style="margin-top: 15px; display: block !important;">
+        <button id="btnSininhoVersiculo" onclick="alternarSubcanalVersiculo()" style="background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(212, 175, 55, 0.5) !important; color: #ffffff !important; padding: 10px 20px !important; border-radius: 20px !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 8px !important; font-weight: 500 !important; font-size: 0.9rem !important; transition: all 0.3s ease !important;">
+            <svg id="iconeSininho" width="18" height="18" fill="none" stroke="#d4af37" stroke-width="2" viewBox="0 0 24 24" style="display: inline-block !important;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-            <span id="textoSininho">Verificando preferências...</span>
+            <span id="textoSininho" style="color: #ffffff !important;">Ativar Versículo Diário</span>
         </button>
     </div>
 </section>
