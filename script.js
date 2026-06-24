@@ -96,11 +96,12 @@ function renderizarLayout(data) {
   // =========================
   // VERSÍCULO
   // =========================
-  const versiculo = document.getElementById("versiculo");
+ // Modificado para buscar o ID correto do parágrafo, sem apagar o sininho
+  const textoVersiculo = document.getElementById("textoVersiculo");
 
-  if (versiculo && data.versiculo) {
-    versiculo.innerText = data.versiculo;
-    versiculo.style.opacity = 1;
+  if (textoVersiculo && data.versiculo) {
+    textoVersiculo.innerText = data.versiculo;
+    textoVersiculo.style.opacity = 1;
   }
 }
 
